@@ -51,6 +51,11 @@ class Person implements Comparable<Person>{
 
 	@Override
 	public int compareTo(Person o) {
-		return this.age-o.age;
+		if(this.age == o.age) {
+			return this.seq-o.seq;
+		}
+		else {
+			return this.age-o.age;
+		}
 	}
 }
