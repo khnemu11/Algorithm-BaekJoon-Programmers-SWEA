@@ -1,41 +1,40 @@
-import java.util.Scanner;
- 
-public class Main{
-    public static void main(String[] args){
-        Scanner sc = new Scanner(System.in);
-        int x1, y1, r1, x2, y2, r2;
-        int testcase;
-        
-        double d;
-        testcase = sc.nextInt();
- 
-        for(int i=0; i<testcase; i++) {
-            int result;
-            
-            x1 = sc.nextInt();
-            y1 = sc.nextInt();
-            r1 = sc.nextInt();
-            x2 = sc.nextInt();
-            y2 = sc.nextInt();
-            r2 = sc.nextInt();
-            //두 점의 길이
-            d = Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
-            
- 
-            //원이 겹쳐서 무한인 경우 Math.abs()절대값 함수
-            if(x1 ==x2 && y1 == y2 && r1 == r2) {
-                result = -1;
-            }
-            else if(d == r1+r2 || Math.abs(r1-r2) == d  ) { //Math.abs(r1-r2) == d
-                result = 1;
-            }
-            else if(Math.abs(r1-r2) > d || x1 ==x2 && y1 == y2 && r1 != r2 || d > r1+r2 ) {
-                result = 0;
-            }
-            else {
-                result = 2;
-            }
-            System.out.println(result);
-        }
-    }
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class Main {
+		public static void main(String []args) throws Exception{	
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			int N = Integer.valueOf(br.readLine());
+			
+			for(int i=0;i<N;i++) {
+				StringTokenizer st = new StringTokenizer(br.readLine());
+				int joX = Integer.valueOf(st.nextToken());
+				int joY = Integer.valueOf(st.nextToken());
+				int joR = Integer.valueOf(st.nextToken());
+				int baekX = Integer.valueOf(st.nextToken());
+				int baekY = Integer.valueOf(st.nextToken());
+				int baekR = Integer.valueOf(st.nextToken());
+				double distance = Math.sqrt(Math.pow(baekX-joX,2) + Math.pow(baekY-joY,2));
+				
+				if(joX==baekX && joY==baekY && baekR==joR){
+					System.out.println(-1);
+				}
+				else if(joR+baekR< distance){
+					System.out.println(0);
+				}
+				else if(joR+baekR==distance|| Math.abs(joR-baekR)==distance){
+					System.out.println(1);
+				}
+				else if((Math.abs(joR-baekR) > distance) || (joR+baekR < distance) || (joX==baekX && joY==baekY && baekR!=joR)) {
+					System.out.println(0);
+				}
+				else {
+					System.out.println(2);
+				}
+				
+			}
+			
+			br.close();
+		}		
 }
