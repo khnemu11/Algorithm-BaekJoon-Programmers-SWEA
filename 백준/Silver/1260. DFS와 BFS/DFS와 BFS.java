@@ -1,10 +1,7 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -12,15 +9,12 @@ import java.util.StringTokenizer;
 
 public class Main {
 	static ArrayList<ArrayList<Integer>> graph;
-	static Queue<Integer> bfsRoute;
-	static Queue<Integer> dfsRoute;
 	static boolean[] bfsvisited;
 	static boolean[] dfsvisited;
 	static boolean[] existed;
 
 	public static void main(String arg[]) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		int vertices = Integer.valueOf(st.nextToken());
@@ -30,8 +24,6 @@ public class Main {
 		dfsvisited = new boolean[vertices + 1];
 		existed = new boolean[vertices + 1];
 		graph = new ArrayList<>();
-		dfsRoute = new LinkedList<>();
-		bfsRoute = new LinkedList<>();
 		for (int i = 0; i <= vertices; i++) {
 			graph.add(new ArrayList<Integer>());
 		}
@@ -49,7 +41,7 @@ public class Main {
 		for (int i = 1; i <= vertices; i++) {
 			Collections.sort(graph.get(i));
 		}
-		// dfs 실행
+		// dfs/bfs 실행
 		
 		if(existed[start]) {
 			dfs(start);
@@ -60,29 +52,9 @@ public class Main {
 			System.out.println(start);
 			System.out.println(start);
 		}
-
-		// 출력 문구
-//		StringBuilder sb = new StringBuilder();
-//		while (!dfsRoute.isEmpty()) {
-//			sb.append(dfsRoute.poll());
-//			sb.append(" ");
-//		}
-//
-//		sb.deleteCharAt(sb.length() - 1);
-//		sb.append("\n");
-//		System.out.println();
-//		while (!bfsRoute.isEmpty()) {
-//			sb.append(bfsRoute.poll());
-//			sb.append(" ");
-//		}
-//		sb.deleteCharAt(sb.length() - 1);
-//
-//		System.out.println(sb.toString());
-		bw.flush();
-		bw.close();
 		br.close();
 	}
-
+	//dfs 구현부
 	static void dfs(int from) {
 		dfsvisited[from] = true;
 		System.out.print(from+" ");
@@ -92,7 +64,7 @@ public class Main {
 			}
 		}
 	}
-
+	//bfs 구현부, bfs는 재귀로 하면 알고리즘이 어려우니 반복문으로 구현
 	static void bfs(int from) {
 		bfsvisited[from] = true;
 		Queue<Integer> next = new LinkedList<>();
@@ -108,18 +80,5 @@ public class Main {
 				}
 			}
 		}
-		
-//		Queue<Integer> next = new LinkedList<>();
-//		for (int i = 0; i < graph.get(from).size(); i++) {
-//			if (!bfsvisited[graph.get(from).get(i)]) {
-//				bfsvisited[graph.get(from).get(i)] = true;
-//				bfsRoute.add(graph.get(from).get(i));
-//				next.add(graph.get(from).get(i));
-//			}
-//		}
-//		while (!next.isEmpty()) {
-//			int nextNode = next.poll();
-//			bfs(nextNode);
-//		}
 	}
 }
