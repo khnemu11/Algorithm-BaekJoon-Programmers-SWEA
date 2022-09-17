@@ -11,7 +11,10 @@ public class Main {
 
 		br.readLine();
 		bw.write('A');
-
+		
+		bw.newLine();
+		bw.flush();
+		
 		br.close();
 		bw.close();
 	}
