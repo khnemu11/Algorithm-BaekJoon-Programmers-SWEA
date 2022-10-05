@@ -22,27 +22,4 @@ public class Main {
 		br.close();
 	}
 
-	public static boolean dfs(int[] arr, int depth, int sum) {
-		if (depth == 7) {
-			if (sum == 100) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		for (int i = 0; i < 9; i++) {
-			if (visited[i]) {
-				continue;
-			}
-			visited[i] = true;
-			if (dfs(arr, depth + 1, sum + arr[i])) {
-				return true;
-			} else {
-				visited[i] = false;
-			}
-		}
-
-		return false;
-	}
 }
