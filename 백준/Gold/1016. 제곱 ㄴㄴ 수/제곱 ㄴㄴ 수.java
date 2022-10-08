@@ -13,7 +13,6 @@ public class Main {
 		long min = Long.valueOf(st.nextToken());
 		long max = Long.valueOf(st.nextToken());
 		int size = (int) (max - min + 1);
-//		System.out.println(size);
 		boolean visited[] = new boolean[size + 1];
 
 		int result = size;
@@ -27,23 +26,11 @@ public class Main {
 				start = min + (next - min % (next));
 			}
 
-			if (start > max) {
-				continue;
-			}
-//			System.out.println("i : " + i);
-//			System.out.println("next : " + next);
-//			System.out.println("min : " + min);
-//			System.out.println("start : " + start);
-
 			while (start <= max) {
 				if (visited[(int) (start - min)] == true) {
 				} else {
 					visited[(int) (start - min)] = true;
 					result--;
-//					System.out.println(start + " 제곱 수");
-//					System.out.println(start - min + " index");
-//					System.out.println(max + " 최대값");
-//					System.out.println("result  : " + result);
 				}
 
 				start = start + next;
