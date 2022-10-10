@@ -24,20 +24,17 @@ public class Main {
 
 			sum[up][0] = arr[up][0];
 			sum[down][0] = arr[down][0];
-
-			for (int i = 1; i < length; i++) {
-				sum[up][i] = sum[down][i - 1] + arr[up][i];
-				sum[down][i] = sum[up][i - 1] + arr[down][i];
-
-				if (i - 2 >= 0 && Math.max(sum[up][i - 2], sum[down][i - 2]) + arr[up][i] > sum[up][i]) {
-					sum[up][i] = Math.max(sum[up][i - 2], sum[down][i - 2]) + arr[up][i];
+			if (length > 1) {
+				sum[up][1] = arr[down][0] + arr[up][1];
+				sum[down][1] = arr[up][0] + arr[down][1];
+				for (int i = 2; i < length; i++) {
+					int max = Math.max(sum[up][i - 2], sum[down][i - 2]);
+					sum[up][i] = Math.max(sum[down][i - 1], max) + arr[up][i];
+					sum[down][i] = Math.max(sum[up][i - 1], max) + arr[down][i];
 				}
-				if (i - 2 >= 0 && Math.max(sum[up][i - 2], sum[down][i - 2]) + arr[down][i] > sum[down][i]) {
-					sum[down][i] = Math.max(sum[up][i - 2], sum[down][i - 2]) + arr[down][i];
-				}
-
 			}
-			bw.write(String.valueOf(Math.max(sum[down][length-1], sum[up][length-1])));
+
+			bw.write(String.valueOf(Math.max(sum[down][length - 1], sum[up][length - 1])));
 			bw.newLine();
 		}
 		bw.flush();
