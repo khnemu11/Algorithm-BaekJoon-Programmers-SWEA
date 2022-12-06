@@ -1,93 +1,89 @@
-
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.StringTokenizer;
 
 public class Main {
+	static long num[];
 
-	static int N, S;
-	static long[] arr;
-	static List<Long> left = new ArrayList<>();
-	static List<Long> right = new ArrayList<>();
-
-	public static void main(String[] args) throws Exception {
-
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		String[] sarr = br.readLine().split(" ");
+		int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+		int size = row[0];
+		int goal = row[1];
 
-		N = Integer.parseInt(sarr[0]);
-		S = Integer.parseInt(sarr[1]);
+		num = new long[size];
 
-		arr = new long[N];
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-		sarr = br.readLine().split(" ");
-
-		for (int i = 0; i < N; i++) {
-			arr[i] = Long.parseLong(sarr[i]);
+		for (int i = 0; i < size; i++) {
+			num[i] = Long.valueOf(st.nextToken());
 		}
 
-		getSubsequence(0, N / 2, 0, left);
-		getSubsequence(N / 2, N, 0, right);
+		ArrayList<Long> leftList = new ArrayList<>();
+		ArrayList<Long> rightList = new ArrayList<>();
 
-		Collections.sort(left);
-		Collections.sort(right);
+		findSubSequence(0, size / 2, 0, leftList);
+		findSubSequence(size / 2, size, 0, rightList);
 
-		long cnt = getCnt();
+		Collections.sort(leftList);
+		Collections.sort(rightList);
 
-		if (S == 0)
-			cnt--;
+		long result = 0;
+		int leftp = 0;
+		int rightp = rightList.size() - 1;
 
-		bw.write(cnt + "\n");
-		bw.flush();
+		while (leftp < leftList.size() && rightp >= 0) {
+			long left = leftList.get(leftp);
+			long right = rightList.get(rightp);
+			long sum = left + right;
 
-	}
-
-	public static void getSubsequence(int idx, int end, long sum, List<Long> list) {
-
-		if (idx == end) {
-			list.add(sum);
-			return;
-		}
-
-		getSubsequence(idx + 1, end, sum + arr[idx], list);
-		getSubsequence(idx + 1, end, sum, list);
-	}
-
-	public static long getCnt() {
-
-		int pl = 0;
-		int pr = right.size() - 1;
-		long cnt = 0;
-
-		while (pl < left.size() && pr >= 0) {
-
-			long sum = left.get(pl) + right.get(pr);
-
-			if (sum == S) {
-				long a = left.get(pl);
-				long cnt1 = 0;
-				while (pl < left.size() && left.get(pl) == a) {
-					pl++;
-					cnt1++;
+			if (sum == goal) {
+				long leftCount = 0;
+				while (leftp < leftList.size() && leftList.get(leftp) == left) {
+					leftCount++;
+					leftp++;
 				}
 
-				long b = right.get(pr);
-				long cnt2 = 0;
-				while (pr >= 0 && right.get(pr) == b) {
-					pr--;
-					cnt2++;
+				long rightCount = 0;
+				while (rightp >= 0 && rightList.get(rightp) == right) {
+					rightCount++;
+					rightp--;
 				}
 
-				cnt += cnt1 * cnt2;
+				result += leftCount * rightCount;
+			} else if (sum < goal) {
+				leftp++;
+			} else {
+				rightp--;
 			}
 
-			else if (sum < S)
-				pl++;
-			else
-				pr--;
 		}
 
-		return cnt;
+		if (goal == 0 && result > 0) {
+			result--;
+		}
+
+		bw.write(String.valueOf(result));
+		bw.newLine();
+		bw.flush();
+	}
+
+	public static void findSubSequence(int curr, int depth, long sum, ArrayList<Long> list) {
+		if (curr == depth) {
+			list.add(sum);
+			
+			return;
+		} else {
+			findSubSequence(curr + 1, depth, sum + num[curr], list);
+			findSubSequence(curr + 1, depth, sum, list);
+		}
 	}
 }
