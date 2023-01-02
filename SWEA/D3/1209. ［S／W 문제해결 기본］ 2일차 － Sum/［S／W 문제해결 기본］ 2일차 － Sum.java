@@ -1,58 +1,47 @@
-import java.util.Arrays;
-import java.util.Scanner;
+import java.io.IOException;
+import java.util.*;
 
 public class Solution {
-	public static void main(String arg[]) {
+	public static void main(String[] args) throws IOException {
 		Scanner sc = new Scanner(System.in);
+
 		for (int test_case = 1; test_case <= 10; test_case++) {
-			int no = sc.nextInt();
+			sc.nextInt();
 
-			int board[][] = new int[100][100];
-
-			for (int i = 0; i < 100; i++) {
-				for (int j = 0; j < 100; j++) {
-					board[i][j] = sc.nextInt();
-				}
-			}
+			int arr[][] = new int[100][100];
 			int max = 0;
-
-			// 행
-
 			for (int i = 0; i < 100; i++) {
-				max = Math.max(max, Arrays.stream(board[i]).sum());
+				int rowSum = 0;
+				for (int j = 0; j < 100; j++) {
+					arr[i][j] = sc.nextInt();
+					rowSum += arr[i][j];
+				}
+				max = Math.max(rowSum, max);
 			}
-			// 열
 
 			for (int j = 0; j < 100; j++) {
-				int sum = 0;
+				int colSum = 0;
 				for (int i = 0; i < 100; i++) {
-					sum += board[i][j];
+					colSum += arr[i][j];
 				}
-				max = Math.max(sum, max);
+				max = Math.max(colSum, max);
 			}
-
-			// 왼 대각
-			for (int j = 99; j >= 0; j--) {
-				int sum = 0;
-				for (int i = 0; i < 100; i++) {
-					sum += board[i][j];
-				}
-
-				max = Math.max(sum, max);
+			int leftDiagSum = 0;
+			for (int i = 0; i < 100; i++) {
+				leftDiagSum += arr[i][i];
 			}
-			// 오른대각
+			max = Math.max(leftDiagSum, max);
 
-			for (int j = 0; j < 100; j++) {
-				int sum = 0;
-				for (int i = 99; i >= 0; i--) {
-					sum += board[i][j];
-				}
-
-				max = Math.max(sum, max);
+			int rightDiagSum = 0;
+			for (int i = 99; i >= 0; i--) {
+				rightDiagSum += arr[99 - i][i];
 			}
-			StringBuilder result = new StringBuilder("#");
-			result.append(no).append(" ").append(max);
-			System.out.println(result.toString());
+			max = Math.max(rightDiagSum, max);
+
+			StringBuilder sb = new StringBuilder();
+			sb.append("#" + test_case + " " + max);
+			System.out.println(sb.toString());
 		}
 	}
+
 }
