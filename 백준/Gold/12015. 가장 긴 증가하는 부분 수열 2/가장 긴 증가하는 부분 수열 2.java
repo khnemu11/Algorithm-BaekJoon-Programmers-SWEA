@@ -1,51 +1,40 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Arrays;
-import java.util.StringTokenizer;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		int size = Integer.valueOf(br.readLine());
+		int num[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+		int dp[] = new int[size];
 
-		int N = Integer.valueOf(br.readLine());
+		int length = 1;
 
-		int arr[] = new int[N];
+		dp[0] = num[0];
 
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		arr[0] = Integer.valueOf(st.nextToken());
-
-		int start = 0;
-		int end = 0;
-
-		for (int i = 1; i < N; i++) {
-			int curr = Integer.valueOf(st.nextToken());
-
-			if (arr[end] < curr) {
-				end++;
-				arr[end] = curr;
+		for (int i = 1; i < num.length; i++) {
+			if (dp[length - 1] < num[i]) {
+				length++;
+				dp[length - 1] = num[i];
 			} else {
-				int l = start;
-				int r = end;
-
+				int mid = 0;
+				int l = 0;
+				int r = length - 1;
 				while (l < r) {
-					int mid = (l + r) / 2;
-					if (arr[mid] < curr) {
-						l = mid+1;
+					mid = (l + r) / 2;
+
+					if (dp[mid] < num[i]) {
+						l = mid + 1;
 					} else {
 						r = mid;
-					} 
+					}
 				}
-				arr[l] = curr;
+
+				dp[l] = num[i];
 			}
 		}
-		bw.write(String.valueOf(end+1));
-		bw.newLine();
-		bw.flush();
-		bw.close();
-		br.close();
+		System.out.println(length);
 	}
 }
