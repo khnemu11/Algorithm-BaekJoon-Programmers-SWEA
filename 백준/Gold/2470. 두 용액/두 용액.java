@@ -14,40 +14,24 @@ public class Main {
 		int l = 0;
 		int r = size - 1;
 		int min = Integer.MAX_VALUE;
-		int minL = l;
-		int minR = r;
+		int minL = nums[l];
+		int minR = nums[r];
+
 		while (l < r) {
+
 			if (min > Math.abs(nums[l] + nums[r])) {
+				minL = nums[l];
+				minR = nums[r];
 				min = Math.abs(nums[l] + nums[r]);
-				minL = l;
-				minR = r;
 			}
 
-			if (min == 0) {
-				break;
-			} else if (nums[l] > 0) {
-				r = l + 1;
-				if (min > Math.abs(nums[l] + nums[r])) {
-					min = Math.abs(nums[l] + nums[r]);
-					minL = l;
-					minR = r;
-				}
-				break;
-			} else if (nums[r] < 0) {
-				l = r - 1;
-				if (min > Math.abs(nums[l] + nums[r])) {
-					min = Math.abs(nums[l] + nums[r]);
-					minL = l;
-					minR = r;
-				}
-				break;
-			} else if (Math.abs(nums[l + 1] + nums[r]) < Math.abs(nums[l] + nums[r - 1])) {
-				l++;
-			} else {
+			if (nums[l] + nums[r] > 0) {
 				r--;
+			} else {
+				l++;
 			}
 		}
 
-		System.out.println(nums[minL] + " " + nums[minR]);
+		System.out.println(minL + " " + minR);
 	}
 }
