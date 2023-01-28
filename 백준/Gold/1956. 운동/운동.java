@@ -14,10 +14,9 @@ public class Main {
 		int E = Integer.valueOf(st.nextToken());
 		ArrayList<ArrayList<Node>> graph = new ArrayList<>();
 		int minArr[][] = new int[V + 1][V + 1];
-		int INF = 5000000;
+		int INF = 10000000;
 		for (int i = 0; i <= V; i++) {
 			graph.add(new ArrayList<Node>());
-			graph.get(i).add(new Node(i, 0));
 			Arrays.fill(minArr[i], INF);
 		}
 
@@ -39,18 +38,13 @@ public class Main {
 			}
 		}
 
-		int min = Integer.MAX_VALUE;
+		int min = INF;
 
 		for (int from = 1; from <= V; from++) {
-			for (int to = 1; to <= V; to++) {
-				if (from == to || minArr[from][to] == INF || minArr[to][from] == INF) {
-					continue;
-				}
-				min = Math.min(min, minArr[from][to] + minArr[to][from]);
-			}
+			min = Math.min(min, minArr[from][from]);
 		}
 
-		if (min == Integer.MAX_VALUE) {
+		if (min == INF) {
 			System.out.println(-1);
 		} else {
 			System.out.println(min);
