@@ -8,6 +8,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
+
+/*
+	풀이 알고리즘
+	1) 2^30은 약 10억 -> dfs 불가
+	2) 가방의 최대값은 1억 -> dp를 이용했을 때 최대 배열 크기 = 30*1억 = 30억 -> dp불가
+	3) 절반인 2^15는 약 3만으로 dfs 2번이면 6만 연산으로 가능
+	4) 절반 한쪽의 값 + 나머지 절반 한쪽의 값을 순차적으로 비교하여 가방의 크기를 넘을때 까지 탐색 -> 2^15 * 2^15 = 2^30 -> 연산 불가
+	5) 절반 한쪽의 값 + 나머지 절반 한쪽의 값을 이분탐색으로 비교하여 가방의 크기를 넘을때 까지 탐색 -> 2^15 * log2(2^15) = 2^15*15 ->연산 가능
+	6) 각 입력값 숫자를 절반으로 나눠 dfs로 나올 수 있는 모든 합 구하기
+	7) 한쪽 배열을 기준으로 이분탐색으로 나머지 배열에서 합칠 수 있는 가장 큰 값을 구하고 해당 값 이하의 개수를 더해줘서 출력
+	
+	풀이 도출 팁 : 입력값의 크기가 크다면 절반으로 나눠 볼 생각을 하자
+*/
+
 public class Main {
 	static ArrayList<Integer> aSum = new ArrayList<>();
 	static ArrayList<Integer> bSum = new ArrayList<>();;
@@ -28,9 +42,9 @@ public class Main {
 
 		for (int num : aSum) {
 			int l = 0;
-			int r = bSum.size();
+			int r = bSum.size() - 1;
 			int cnt = 0;
-			while (l <= r && l < bSum.size()) {
+			while (l <= r) {
 				int mid = (l + r) / 2;
 				if (bSum.get(mid) + num <= C) {
 					cnt = mid;
