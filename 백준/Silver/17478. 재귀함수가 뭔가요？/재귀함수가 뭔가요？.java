@@ -1,45 +1,41 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+/*
+ * 
+ * 풀이 알고리즘
+	반복하는 횟수에 따라 접두어가 붙어 문장을 출력하는 문제이므로 재귀를 활용
+*/
 
 public class Main {
-		public static void main(String []args) throws Exception{	
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			
-			int num = Integer.valueOf(br.readLine());
-			
-			WhatIsRecursive whatIsRecursive = new WhatIsRecursive();
-			
-			System.out.println("어느 한 컴퓨터공학과 학생이 유명한 교수님을 찾아가 물었다.");
-			whatIsRecursive.answer(num,0);
-		
+	static int N;
+	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+		N = Integer.valueOf(br.readLine());
+		bw.write("어느 한 컴퓨터공학과 학생이 유명한 교수님을 찾아가 물었다.\n");
+		ask(0, "");
+
+		bw.flush();
+	}
+
+	public static void ask(int curr, String prefix) throws IOException {
+		bw.write(prefix + "\"재귀함수가 뭔가요?\"\n");
+
+		if (curr == N) {
+			bw.write(prefix + "\"재귀함수는 자기 자신을 호출하는 함수라네\"");
+			bw.newLine();
+		} else {
+			bw.write(prefix + "\"잘 들어보게. 옛날옛날 한 산 꼭대기에 이세상 모든 지식을 통달한 선인이 있었어.\n");
+			bw.write(prefix + "마을 사람들은 모두 그 선인에게 수많은 질문을 했고, 모두 지혜롭게 대답해 주었지.\n");
+			bw.write(prefix + "그의 답은 대부분 옳았다고 하네. 그런데 어느 날, 그 선인에게 한 선비가 찾아와서 물었어.\"\n");
+
+			ask(curr + 1, prefix + "____");
 		}
-}
-class WhatIsRecursive {
-    public void answer(int num,int line) {
-    	
-    	printLine(line);
-    	System.out.println("\"재귀함수가 뭔가요?\"");
-    
-    	if(num>0) {
-    		printLine(line);
-        	System.out.println("\"잘 들어보게. 옛날옛날 한 산 꼭대기에 이세상 모든 지식을 통달한 선인이 있었어.");
-        	printLine(line);
-        	System.out.println("마을 사람들은 모두 그 선인에게 수많은 질문을 했고, 모두 지혜롭게 대답해 주었지.");
-        	printLine(line);
-        	System.out.println("그의 답은 대부분 옳았다고 하네. 그런데 어느 날, 그 선인에게 한 선비가 찾아와서 물었어.\"");
-        	answer(num-1,line+1);
-        }
- 
-        else {
-        	printLine(line);
-        	System.out.println("\"재귀함수는 자기 자신을 호출하는 함수라네\"");
-        }
-    	printLine(line);
-        System.out.println("라고 답변하였지.");
-    }
-    public void printLine(int count) {
-    	for(int i=0;i<count;i++) {
-    		System.out.print("____");
-    	}
-    }
+		bw.write(prefix + "라고 답변하였지.\n");
+	}
 }
