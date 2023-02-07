@@ -6,100 +6,121 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.PriorityQueue;
+import java.util.Stack;
+import java.util.StringTokenizer;
+/*
+	풀이 과정
+	출발지 고정, 도착지까지 최소거리 -> 우선순위 큐를 이용한 다익스트라
+	경로를 기억해야 하므로 각 최소거리가 갱신될 때마다 부모를 저장
+*/
 
 public class Main {
-	public static void main(String[] args) throws IOException {
+	static ArrayList<ArrayList<Node>> graph;
+	static int distance[];
+	static int parents[];
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		int city = Integer.valueOf(br.readLine());
-		int bus = Integer.valueOf(br.readLine());
+		int N = Integer.valueOf(br.readLine());
+		int M = Integer.valueOf(br.readLine());
 
-		ArrayList<ArrayList<Vertex>> route = new ArrayList<>();
-
-		for (int i = 0; i <= city; i++) {
-			route.add(new ArrayList<Vertex>());
-			route.get(i).add(new Vertex(i, 0));
-		}
-		for (int i = 0; i < bus; i++) {
-			int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-
-			route.get(row[0]).add(new Vertex(row[1], row[2]));
+		graph = new ArrayList<>();
+		distance = new int[N + 1];
+		parents = new int[N + 1];
+		for (int i = 0; i <= N; i++) {
+			graph.add(new ArrayList<Node>());
+			parents[i] = i;
 		}
 
-		int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-		int start = row[0];
-		int goal = row[1];
-		int INF = 200000000;
-		int minRoute[] = new int[city + 1];
-		Arrays.fill(minRoute, INF);
-		minRoute[start] = 0;
-		boolean visited[] = new boolean[city + 1];
-		ArrayList<ArrayList<Integer>> path = new ArrayList<>();
+		for (int i = 0; i < M; i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int from = Integer.valueOf(st.nextToken());
+			int to = Integer.valueOf(st.nextToken());
+			int cost = Integer.valueOf(st.nextToken());
 
-		for (int i = 0; i <= city; i++) {
-			path.add(new ArrayList<Integer>());
+			graph.get(from).add(new Node(to, cost));
 		}
 
-		PriorityQueue<Vertex> queue = new PriorityQueue<>();
-		queue.add(new Vertex(start, 0));
-		while (!queue.isEmpty()) {
-			Vertex mid = queue.poll();
-			if (visited[mid.vertex]) {
-				continue;
-			}
-			visited[mid.vertex] = true;
-			for (Vertex end : route.get(mid.vertex)) {
-//				System.out.println(start + " -> " + mid + " -> " + end);
-				int min = Math.min(minRoute[end.vertex], mid.cost + end.cost);
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-				if (minRoute[end.vertex] != min) {
-					minRoute[end.vertex] = min;
-					path.get(end.vertex).clear();
-					path.get(end.vertex).addAll(path.get(mid.vertex));
-					path.get(end.vertex).add(mid.vertex);
-					queue.add(new Vertex(end.vertex, min));
-				}
-			}
-//			System.out.println("mid : " + mid.vertex);
-//			System.out.println(Arrays.toString(minRoute));
-		}
+		int start = Integer.valueOf(st.nextToken());
+		int end = Integer.valueOf(st.nextToken());
 
-		bw.write(String.valueOf(minRoute[goal]));
-		bw.newLine();
+		dajikstra(start);
 
-		bw.write(String.valueOf(path.get(goal).size() + 1));
-		bw.newLine();
+		int route[] = getRoute(end);
+
+		bw.write(distance[end] + "\n");
+		bw.write(route.length + "\n");
 
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < path.get(goal).size(); i++) {
-			sb.append(path.get(goal).get(i)).append(" ");
-		}
-		sb.append(goal);
 
-		bw.write(sb.toString());
-		bw.newLine();
+		for (int i = 0; i < route.length; i++) {
+			sb.append(route[i] + " ");
+		}
+		bw.write(sb.deleteCharAt(sb.length() - 1).toString() + "\n");
 
 		bw.flush();
 	}
+
+	public static void dajikstra(int start) {
+		PriorityQueue<Node> pq = new PriorityQueue<>();
+		pq.add(new Node(start, 0));
+
+		Arrays.fill(distance, 100_000_000);
+		distance[start] = 0;
+
+		while (!pq.isEmpty()) {
+			Node from = pq.poll();
+
+			if (from.cost > distance[from.val]) {
+				continue;
+			}
+
+			for (Node to : graph.get(from.val)) {
+				if (to.cost + distance[from.val] < distance[to.val]) {
+					distance[to.val] = to.cost + distance[from.val];
+					pq.add(new Node(to.val, distance[to.val]));
+					parents[to.val] = from.val;
+				}
+			}
+		}
+	}
+
+	public static int[] getRoute(int end) {
+		Stack<Integer> stack = new Stack<>();
+		int child = end;
+		while (parents[child] != child) {
+			stack.add(child);
+			child = parents[child];
+		}
+
+		stack.add(child);
+
+		int routes[] = new int[stack.size()];
+		int idx = 0;
+		while (!stack.isEmpty()) {
+			routes[idx] = stack.pop();
+			idx++;
+		}
+
+		return routes;
+	}
 }
 
-class Vertex implements Comparable<Vertex> {
-	int vertex;
+class Node implements Comparable<Node> {
+	int val;
 	int cost;
 
-	public Vertex(int vertex, int cost) {
-		this.vertex = vertex;
+	public Node(int val, int cost) {
+		this.val = val;
 		this.cost = cost;
 	}
 
 	@Override
-	public String toString() {
-		return "Vertex [vertex=" + vertex + ", cost=" + cost + "]";
-	}
-
-	@Override
-	public int compareTo(Vertex o) {
+	public int compareTo(Node o) {
 		return this.cost - o.cost;
 	}
 }
