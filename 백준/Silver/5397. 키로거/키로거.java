@@ -1,52 +1,52 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Queue;
-import java.util.Stack;
+
+/*
+	풀이 알고리즘
+	커서 -> iterator
+	양 옆으로 움직일 수 있어야함 -> 양방향 리스트 -> listItrator 필요
+*/
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
 		int T = Integer.valueOf(br.readLine());
 
-		for (int test_case = 0; test_case < T; test_case++) {
-			char commandArr[] = br.readLine().toCharArray();
+		for (int test_case = 1; test_case <= T; test_case++) {
+			char commands[] = br.readLine().toCharArray();
 
-			Stack<Character> stack = new Stack<>();
-			Stack<Character> rest = new Stack<>();
-			for (char command : commandArr) {
+			LinkedList<Character> list = new LinkedList<>();
+			ListIterator<Character> it = list.listIterator();
+
+			for (char command : commands) {
 				if (command == '<') {
-					if (!stack.isEmpty()) {
-						rest.add(stack.pop());
+					if (it.hasPrevious()) {
+						it.previous();
 					}
 				} else if (command == '>') {
-					if (!rest.isEmpty()) {
-						stack.add(rest.pop());
+					if (it.hasNext()) {
+						it.next();
 					}
-				} else if (command == '-') {
-					if (!stack.isEmpty()) {
-						stack.pop();
+				} else if (command == '-') { // 현재 커서가 다음에 있고 타겟은 이전이므로 이전으로 돌아가 지워야 한다.
+					if (it.hasPrevious()) {
+						it.previous();
+						it.remove();
 					}
 				} else {
-					stack.add(command);
+					it.add(command);
 				}
-			}
-			while (!rest.isEmpty()) {
-				stack.add(rest.pop());
+
 			}
 
 			StringBuilder sb = new StringBuilder();
-			while (!stack.isEmpty()) {
-				sb.append(stack.pop());
+			for (char alpha : list) {
+				sb.append(alpha);
 			}
-			bw.write(sb.reverse().toString() + "\n");
+			System.out.println(sb.toString());
 		}
-
-		bw.flush();
 	}
 }
