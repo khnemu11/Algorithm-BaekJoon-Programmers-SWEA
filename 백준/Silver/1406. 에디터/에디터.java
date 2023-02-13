@@ -1,61 +1,58 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.StringTokenizer;
+
+/*
+	풀이 알고리즘
+	커서 -> iterator
+	양 옆으로 움직일 수 있어야함 -> 양방향 리스트 -> listItrator 필요
+*/
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
-		String input = br.readLine();
 		LinkedList<Character> list = new LinkedList<>();
+		char str[] = br.readLine().toCharArray();
 
-		for (int i = 0; i < input.length(); i++) {
-			list.add(input.charAt(i));
+		for (char alpha : str) {
+			list.add(alpha);
 		}
 
 		int M = Integer.valueOf(br.readLine());
+
 		ListIterator<Character> it = list.listIterator();
 
 		while (it.hasNext()) {
-			it.next();
+			it.next(); // 커서를 맨 오른쪽으로이동
 		}
 
-		while (M-- > 0) {
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			String command = st.nextToken();
-			if (command.equals("L")) {
+		while (M-- > 0) { // 왼쪽,오른쪽으로 이동시 왼쪽,오른쪽으로 이동이 가능한지 확인 후 이동 필요
+			char[] command = br.readLine().toCharArray();
+			if (command[0] == 'P') {
+				it.add(command[2]);
+			} else if (command[0] == 'L') {
 				if (it.hasPrevious()) {
 					it.previous();
 				}
-			} else if (command.equals("D")) {
-				if (it.hasNext()) {
-					it.next();
-				}
-			} else if (command.equals("B")) {
+			} else if (command[0] == 'B') {
 				if (it.hasPrevious()) {
 					it.previous();
 					it.remove();
 				}
-			} else if (command.equals("P")) {
-				Character word = st.nextToken().charAt(0);
-				it.add(word);
+			} else if (command[0] == 'D') {
+				if (it.hasNext()) {
+					it.next();
+				}
 			}
 		}
+		StringBuilder sb = new StringBuilder();
 
-		for (char c : list) {
-			bw.write(c);
+		for (char alpha : list) {
+			sb.append(alpha);
 		}
 
-		bw.newLine();
-		bw.flush();
-		br.close();
-		bw.close();
+		System.out.println(sb.toString());
 	}
-
 }
