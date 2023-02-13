@@ -1,43 +1,61 @@
-
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.StringTokenizer;
+
+/*
+	풀이 알고리즘
+	인덱스가 주어지므로 링크드 리스트를 이용
+*/
 
 public class Solution {
 	public static void main(String[] args) throws IOException {
-		Scanner sc = new Scanner(System.in);
-		int T;
-		T = 10;
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
+		int T = 10;
+		
 		for (int test_case = 1; test_case <= T; test_case++) {
-			LinkedList<String> list = new LinkedList<>();
-			int length = sc.nextInt();
-
+			LinkedList<String> encrypt = new LinkedList<>();
+			int length = Integer.valueOf(br.readLine());
+			StringTokenizer st = new StringTokenizer(br.readLine());
 			for (int i = 0; i < length; i++) {
-				list.add(sc.next());
+				encrypt.add(st.nextToken());
 			}
 
-			int commandCnt = sc.nextInt();
+			int N = Integer.valueOf(br.readLine());
 
-			while (commandCnt-- > 0) {
-				sc.next();
-				int index = sc.nextInt();
-				int size = sc.nextInt();
+			st = new StringTokenizer(br.readLine());
 
-				for (int i = 0; i < size; i++) {
-					list.add(index + i, sc.next());
+			while (st.hasMoreTokens()) {
+				String command = st.nextToken();
+				int index = Integer.valueOf(st.nextToken());
+				int len = Integer.valueOf(st.nextToken());
+
+				String[] inputs = new String[len];
+
+				for (int i = inputs.length - 1; i >= 0; i--) {
+					inputs[i] = st.nextToken();
+				}
+
+				for (String input : inputs) {
+					encrypt.add(index, input);
 				}
 			}
 
-			StringBuilder result = new StringBuilder("#");
-			result.append(test_case).append(" ");
+			StringBuilder sb = new StringBuilder();
+			sb.append("#").append(test_case).append(" ");
 
 			for (int i = 0; i < 10; i++) {
-				result.append(list.get(i)).append(" ");
+				sb.append(encrypt.get(i) + " ");
 			}
-			result.deleteCharAt(result.length() - 1);
-
-			System.out.println(result.toString());
+			bw.write(sb.deleteCharAt(sb.length() - 1).toString());
+			bw.newLine();
 		}
+
+		bw.flush();
 	}
 }
