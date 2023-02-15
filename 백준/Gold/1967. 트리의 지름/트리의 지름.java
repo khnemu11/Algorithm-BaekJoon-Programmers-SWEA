@@ -4,74 +4,67 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
+
+/*
+	풀이 알고리즘
+	지름의 길이 = 해당 노드의 왼쪽 자식의 길이의 최대 길이 + 오른쪽 자식의 길이의 최대 길이
+	해당 노드의 오른쪽+왼쪽 노드의 길이의 합이 최대 지름이 될 수 있으므로 최대값 판단
+	부모 노드는 자식 노드 중 가장 긴 노드만 필요하므로 자식의 왼쪽, 오른쪽 노드 중 긴 것만 리턴 -> 재귀
+*/
 
 public class Main {
-	static boolean visited[];
-	static ArrayList<ArrayList<Node>> tree;
+	static ArrayList<ArrayList<Node>> tree = new ArrayList<>();
 	static int max;
-	static Node end;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		int V = Integer.valueOf(br.readLine());
-		visited = new boolean[V + 1];
-		tree = new ArrayList<>();
 
-		for (int i = 0; i <= V; i++) {
-			tree.add(new ArrayList<Node>());
+		int N = Integer.valueOf(br.readLine());
+
+		for (int i = 0; i <= N; i++) {
+			tree.add(new ArrayList<>());
 		}
 
-		for (int i = 1; i < V; i++) {
-			int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-			tree.get(row[0]).add(new Node(row[1], row[2]));
-			tree.get(row[1]).add(new Node(row[0], row[2]));
-		}
-		end = new Node(1, 0);
-		dfs(1, 0);
-		visited = new boolean[V + 1];
-		dfs(end.vertex, 0);
+		for (int i = 0; i < N - 1; i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int parent = Integer.valueOf(st.nextToken());
+			int child = Integer.valueOf(st.nextToken());
+			int weight = Integer.valueOf(st.nextToken());
 
-		bw.write(String.valueOf(max));
-		bw.newLine();
+			tree.get(parent).add(new Node(child, weight));
+		}
+		getLength(new Node(1, 0));
+		bw.write(max + "\n");
 		bw.flush();
 	}
 
-	public static void dfs(int start, int sum) {
-		visited[start] = true;
+	public static int getLength(Node curr) { // 자식의 노드만 사용해서 지름의 길이를 구하고 긴 노드를 리턴 (Node curr : 현재 노드)
+		PriorityQueue<Integer> childLength = new PriorityQueue<>(Collections.reverseOrder());
+		childLength.add(0); // 자식이 없는 경우 대비
+		childLength.add(0); // 자식이 없는 경우 대비
 
-		for (int i = 0; i < tree.get(start).size(); i++) {
-			Node curr = tree.get(start).get(i);
-			if (visited[curr.vertex]) {
-				continue;
-			}
-
-			if (max < sum + curr.edge) {
-				max = sum + curr.edge;
-				end = curr;
-			}
-
-			dfs(curr.vertex, sum + curr.edge);
-			visited[curr.vertex] = false;
+		for (Node child : tree.get(curr.val)) {
+			int length = getLength(child) + child.weight;
+			childLength.add(length);
 		}
+		int longest = childLength.poll();
+
+		max = Math.max(max, longest + childLength.poll());
+
+		return longest;
 	}
 }
 
 class Node {
-	int vertex;
-	int edge;
+	int val;
+	int weight;
 
-	public Node() {
-	}
-
-	public Node(int vertex, int edge) {
-		this.vertex = vertex;
-		this.edge = edge;
-	}
-
-	@Override
-	public String toString() {
-		return "Node [vertex=" + vertex + ", edge=" + edge + "]";
+	public Node(int val, int weight) {
+		this.val = val;
+		this.weight = weight;
 	}
 }
