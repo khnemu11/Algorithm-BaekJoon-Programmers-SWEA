@@ -5,65 +5,59 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.StringTokenizer;
+/*
+	풀이 알고리즘
+*/
 
 public class Main {
-
 	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		
-		int N = Integer.parseInt(br.readLine());
-		
-		Meeting [] meetings = new Meeting[N]; 
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int N = Integer.valueOf(br.readLine());
 
-		for(int i=0;i<N;i++) {
+		Meeting meetings[] = new Meeting[N];
+
+		for (int i = 0; i < N; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
-			long start = Integer.parseInt(st.nextToken());
-			long end = Integer.parseInt(st.nextToken());
-			
-			meetings[i] = new Meeting(start,end);
+
+			meetings[i] = new Meeting(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
 		}
+
 		Arrays.sort(meetings);
-		long next = meetings[0].end;
-		int count = 1;
-        
-		for(int i=1;i<N;i++) {
-			if(next <= meetings[i].start) {
-				next = meetings[i].end;
-				count++;
+
+		int end = 0;
+		int cnt = 0;
+
+		for (Meeting meeting : meetings) {
+			if (meeting.start < end) {
+				continue;
 			}
-		}	
-		
-		bw.write(String.valueOf(count));
+			end = meeting.end;
+			cnt++;
+		}
+
+		bw.write(cnt + "\n");
 		bw.flush();
 		bw.close();
 		br.close();
 	}
 
 }
-class Meeting implements Comparable<Meeting>{
-	long start;
-	long end;
-	
-	public Meeting(long start, long end) {
-		super();
+
+class Meeting implements Comparable<Meeting> {
+	int start;
+	int end;
+
+	public Meeting(int start, int end) {
 		this.start = start;
 		this.end = end;
 	}
-	
-	@Override
-	public int compareTo(Meeting o) {
-		if(o.end == this.end) {
-			return (int) (this.start - o.start);
-		}
-		else {
-			return (int) (this.end - o.end);
-		}
-	}
 
 	@Override
-	public String toString() {
-		return "Meeting [start=" + start + ", end=" + end + "]";
+	public int compareTo(Meeting o) {
+		if (this.end == o.end) {
+			return this.start - o.start;
+		}
+		return this.end - o.end;
 	}
-	
 }
