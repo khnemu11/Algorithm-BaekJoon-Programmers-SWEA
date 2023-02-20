@@ -1,66 +1,61 @@
-
-import java.util.Arrays;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.StringTokenizer;
 
 public class Solution {
-	static Food foodArr[];
-	static long max;
+	static int max;
 
-	public static void main(String arg[]) {
-		Scanner sc = new Scanner(System.in);
-
-		int T = sc.nextInt();
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		int T = Integer.valueOf(br.readLine());
 
 		for (int test_case = 1; test_case <= T; test_case++) {
-			int N = sc.nextInt();
-			int L = sc.nextInt();
-			foodArr = new Food[N];
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int N = Integer.valueOf(st.nextToken());
+			int L = Integer.valueOf(st.nextToken());
+			Food foods[] = new Food[N];
+			boolean visited[] = new boolean[N];
 			max = 0;
 
 			for (int i = 0; i < N; i++) {
-				foodArr[i] = new Food(sc.nextInt(), sc.nextInt());
+				st = new StringTokenizer(br.readLine());
+				foods[i] = new Food(Integer.valueOf(st.nextToken()), Integer.valueOf(st.nextToken()));
 			}
 
-			dfs(L, 0, 0, 0, 0);
+			pick(visited, foods, 0, 0, 0, L);
 
-			StringBuilder result = new StringBuilder("#");
-			result.append(test_case).append(" ").append(max);
-			System.out.println(result.toString());
+			StringBuilder sb = new StringBuilder();
+			sb.append("#").append(test_case).append(" ").append(max).append("\n");
+			bw.write(sb.toString());
 		}
+		bw.flush();
 	}
 
-	public static void dfs(int limit, int scoreSum, int calorySum, int curr, int depth) {
-
-		if (curr >= foodArr.length) {
+	public static void pick(boolean visited[], Food foods[], int idx, int scoreSum, int calSum, int L) {
+		if (idx == foods.length) {
 			max = Math.max(scoreSum, max);
 		} else {
+			pick(visited, foods, idx + 1, scoreSum, calSum, L);
 
-			for (int i = curr; i < foodArr.length; i++) {
-
-				if (calorySum + foodArr[i].calory <= limit) {
-					dfs(limit, scoreSum + foodArr[i].score, calorySum + foodArr[i].calory, i + 1, depth + 1);
-				} else {
-
-					max = Math.max(scoreSum, max);
-				}
+			if (calSum + foods[idx].calory <= L) {
+				visited[idx] = true;
+				pick(visited, foods, idx + 1, scoreSum + foods[idx].score, calSum + foods[idx].calory, L);
+				visited[idx] = false;
 			}
 		}
-
 	}
 }
 
 class Food {
-	int calory;
 	int score;
+	int calory;
 
 	public Food(int score, int calory) {
-		this.calory = calory;
 		this.score = score;
+		this.calory = calory;
 	}
-
-	@Override
-	public String toString() {
-		return "Food [calory=" + calory + ", score=" + score + "]";
-	}
-
 }
