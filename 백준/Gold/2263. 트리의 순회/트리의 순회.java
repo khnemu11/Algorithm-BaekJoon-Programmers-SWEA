@@ -1,85 +1,58 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
+/*
+ * 풀이 알고리즘
+ * 포스트오더의 맨 끝 -> 각 노드의 부모
+ * 인오더의 인덱스 노드의 왼쪽 -> 왼쪽 자식, 인오더의 인덱스 노드의 오른쪽 -> 오른쪽 자식
+ * 프리오더의 배열 : 루트, 루트의 왼쪽 자식, 루트의 오른쪽 자식 -->루트, 루트의 왼쪽 자식의 루트, ....(루트의 왼쪽자식의 개수),
+ * 													루트의 오른쪽 자식의 루트
+*/
 public class Main {
-	static Node tree;
-	static int inOrder[];
-	static int postOrder[];
-
+	static int preorder[], inorder[], postorder[];
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		int V = Integer.valueOf(br.readLine());
+		int N = Integer.valueOf(br.readLine());
+		inorder = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+		postorder = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+		preorder = new int[N];
+		makePreOrder(0, 0, N - 1, 0, N - 1);
 
-		inOrder = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-		postOrder = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+		StringBuilder result = new StringBuilder();
 
-		tree = recurr(0, V - 1, 0, V - 1);
-//		System.out.println(tree.toString());
-		preOrder(tree);
+		for (int pre : preorder) {
+			result.append(pre).append(" ");
+		}
 
-		bw.newLine();
-		bw.flush();
+		System.out.println(result.deleteCharAt(result.length() - 1).toString());
 	}
 
-	public static Node recurr(int inOrderLeft, int inOrderRight, int postOrderLeft, int postOrderRight) {
-//		System.out.println(inOrderLeft + " " + inOrderRight + " " + postOrderLeft + " " + postOrderRight);
+	public static void makePreOrder(int preidx, int inl, int inr, int postl, int postr) {
+		preorder[preidx] = postorder[postr]; // 포스트 오더의 맨 오른쪽 값은 노드의 부모의 값이다.
 
-		if (inOrderLeft < 0 || inOrderRight < 0 || postOrderLeft < 0 || postOrderRight < 0 || inOrderLeft > inOrderRight
-				|| postOrderLeft > postOrderRight) {
-//			System.out.println("pass");
-			return null;
+		if (inl == inr && postl == postr) { // 자식이 없다면
+			return;
 		}
-		Node curr = new Node(postOrder[postOrderRight]);
 
-		int mid = 0;
+		int parent = postorder[postr];
+		int mid = inl;
 
-		for (int i = inOrderLeft; i <= inOrderRight; i++) {
-			if (inOrder[i] == curr.vertex) {
+		for (int i = inl; i <= inr; i++) { // 인오더에서 부모 노드를 찾아 왼쪽,오른쪽을 나누기 위해 부모노드를 찾는 부분
+			if (inorder[i] == parent) {
 				mid = i;
 				break;
 			}
 		}
+		int leftLength = mid - inl; // 왼쪽 노드의 자식 개수
+		int rightLength = inr - mid; // 오른쪽 노드의 자식 개수
 
-//		System.out.println("mid : " + mid);
-//		System.out.println("left length : " + (mid - inOrderLeft));
-//		System.out.println("right length : " + (inOrderRight - mid));
-		curr.left = recurr(inOrderLeft, mid - 1, postOrderLeft, postOrderLeft + mid - inOrderLeft - 1);
-		curr.right = recurr(mid + 1, inOrderRight, postOrderLeft + mid - inOrderLeft, postOrderRight - 1);
-
-		return curr;
-	}
-
-	public static void preOrder(Node curr) {
-		if (curr == null) {
-			return;
+		if (leftLength > 0) {
+			makePreOrder(preidx + 1, inl, mid - 1, postl, postl + leftLength - 1);
 		}
-		System.out.print(curr.vertex + " ");
-		preOrder(curr.left);
-		preOrder(curr.right);
+		if (rightLength > 0) {
+			makePreOrder(preidx + leftLength + 1, mid + 1, inr, postl + leftLength, postr - 1);
+		}
 	}
-
-}
-
-class Node {
-	int vertex;
-	Node left;
-	Node right;
-
-	public Node() {
-	}
-
-	public Node(int vertex) {
-		this.vertex = vertex;
-	}
-
-	@Override
-	public String toString() {
-		return "Node [vertex=" + vertex + ", left=" + left + ", right=" + right + "]";
-	}
-
 }
