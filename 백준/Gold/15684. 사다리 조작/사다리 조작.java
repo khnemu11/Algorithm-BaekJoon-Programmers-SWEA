@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
  * */
 
 public class Main {
-	static boolean ladder[][][];
+	static boolean ladder[][][]; // 층,from,to
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -31,7 +31,7 @@ public class Main {
 			int from = Integer.valueOf(st.nextToken());
 			int to = from + 1;
 
-			ladder[height][from][to] = true;	//사다리 세우기
+			ladder[height][from][to] = true; // 사다리 세우기
 			ladder[height][to][from] = true;
 		}
 		for (int cnt = 0; cnt <= 4; cnt++) {
@@ -59,7 +59,7 @@ public class Main {
 						to = to + 1;
 					}
 				}
-				if (to != f) {	//출발지랑 도착지가 다르면 해당 경우는 안됨
+				if (to != f) { // 출발지랑 도착지가 다르면 해당 경우는 안됨
 					return false;
 				}
 			}
