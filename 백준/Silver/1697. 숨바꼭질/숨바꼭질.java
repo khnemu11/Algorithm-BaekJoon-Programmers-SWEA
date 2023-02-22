@@ -3,80 +3,57 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class Main {
-	static boolean visited[];
+/*풀이 알고리즘
+ * *2, +1, -1를 이동하여 목표 장소면 탈출하는 반복문 필요 -> BFS
+ * 이때 *2가 +1, -1보다 이동량이 많으므로 정답일 확률이 높음 -> DEQUE를 활용해 우선순위 적용
+ * 먼저 도착한 위치의 시간을 저장하여 동생의 위치에 도착했을 때 bfs를 탈출하고 동생의 위치의 시간을 출력
+ * */
 
+public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		Queue<Move> moves = new LinkedList<>();
-		visited = new boolean[100001];
 		StringTokenizer st = new StringTokenizer(br.readLine());
 
-		int start = Integer.valueOf(st.nextToken());
-		int goal = Integer.valueOf(st.nextToken());
+		int N = Integer.valueOf(st.nextToken()); // 수빈이의 위치
+		int K = Integer.valueOf(st.nextToken()); // 동생의 위치
 
-		moves.add(new Move(0, start));
+		boolean visited[] = new boolean[100001];
+		int time[] = new int[100001];
+		Deque<Integer> deque = new LinkedList<>();
+		deque.add(N);
 
-		int result = find(moves, goal);
+		while (!deque.isEmpty()) {
+			int curr = deque.pollFirst();
+			visited[curr] = true;
+			if (curr == K) {
+				break;
+			}
+			if (curr * 2 < visited.length && !visited[curr * 2]) {
+				time[curr * 2] = time[curr] + 1;
+				deque.addFirst(curr * 2); // 우선순위가 높으므로 앞에 저장
+				visited[curr * 2] = true;
+			}
 
-		bw.write(String.valueOf(result));
+			if (curr + 1 < visited.length && !visited[curr + 1]) {
+				time[curr + 1] = time[curr] + 1;
+				deque.addLast(curr + 1); // 우선순위가 낮으므로 뒤에 저장
+				visited[curr + 1] = true;
+			}
+			if (curr - 1 >= 0 && !visited[curr - 1]) {
+				time[curr - 1] = time[curr] + 1;
+				deque.addLast(curr - 1); // 우선순위가 낮으므로 뒤에 저장
+				visited[curr - 1] = true;
+			}
+		}
+
+		bw.write(time[K] + "\n");
 		bw.flush();
 		bw.close();
 		br.close();
-	}
-
-	public static int find(Queue<Move> moves, int goal) {
-//		System.out.println(moves.size());
-		Move element = moves.poll();
-//		System.out.println("curr " + element.curr);
-		visited[element.curr] = true;
-//		System.out.println(element);
-		if (element.curr == goal) {
-			return element.count;
-		}
-
-		if (element.curr > 0 && !visited[element.curr - 1]) {
-			moves.add(new Move(element.count + 1, element.curr - 1));
-		}
-		if (element.curr < goal) {
-			if (element.curr + 1 <= 100000 && !visited[element.curr + 1]) {
-				moves.add(new Move(element.count + 1, element.curr + 1));
-			}
-			if (element.curr * 2 <= 100000 && !visited[element.curr * 2]) {
-				moves.add(new Move(element.count + 1, element.curr * 2));
-			}
-
-		}
-
-		return find(moves, goal);
-	}
-}
-
-class Move implements Comparable<Move> {
-	int count;
-	int curr;
-	int differ;
-
-	public Move(int count, int curr) {
-		this.count = count;
-		this.curr = curr;
-	}
-
-	@Override
-	public String toString() {
-		return "Move [count=" + count + ", curr=" + curr + ", differ=" + differ + "]";
-	}
-
-	@Override
-	public int compareTo(Move o) {
-		if (this.count != o.count) {
-			return this.differ - o.differ;
-		}
-		return this.count - o.count;
 	}
 }
