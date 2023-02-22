@@ -38,30 +38,21 @@ public class Main {
 		int areaNum = getAreaNum(map, icebergs);
 		while (areaNum == 1) {
 			int loop = icebergs.size();
-			Queue<Melt> meltQ = new LinkedList<>();
+			boolean visited[][] = new boolean[map.length][map[0].length];
 			while (loop-- > 0) {
 				Coordinate curr = icebergs.poll();
 				int meltCount = 0;
+				visited[curr.row][curr.col] = true;
 				for (int k = 0; k < upDown.length; k++) {
 					Coordinate next = new Coordinate(curr.row + upDown[k], curr.col + leftRight[k]);
-					if (map[next.row][next.col] == 0) {
+					if (!visited[next.row][next.col] && map[next.row][next.col] == 0) {
 						meltCount++;
 					}
 				}
-				if (meltCount > 0) {
-					meltQ.add(new Melt(curr.row, curr.col, meltCount));
-				} else {
+				map[curr.row][curr.col] = map[curr.row][curr.col] - meltCount < 0 ? 0
+						: map[curr.row][curr.col] - meltCount;
+				if (map[curr.row][curr.col] > 0) {
 					icebergs.add(curr);
-				}
-			}
-
-			while (!meltQ.isEmpty()) {
-				Melt melt = meltQ.poll();
-				map[melt.row][melt.col] = map[melt.row][melt.col] - melt.weight < 0 ? 0
-						: map[melt.row][melt.col] - melt.weight;
-
-				if (map[melt.row][melt.col] > 0) {
-					icebergs.add(new Coordinate(melt.row, melt.col));
 				}
 			}
 
@@ -79,6 +70,7 @@ public class Main {
 		bw.close();
 		br.close();
 	}
+
 	public static int getAreaNum(int map[][], Queue<Coordinate> q) {
 		int count = 0;
 		boolean visited[][] = new boolean[map.length][map[0].length];
@@ -126,14 +118,5 @@ class Coordinate {
 	public Coordinate(int row, int col) {
 		this.row = row;
 		this.col = col;
-	}
-}
-
-class Melt extends Coordinate {
-	int weight;
-
-	public Melt(int row, int col, int weight) {
-		super(row, col);
-		this.weight = weight;
 	}
 }
