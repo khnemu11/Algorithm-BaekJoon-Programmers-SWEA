@@ -1,84 +1,98 @@
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-	static ArrayList<ArrayList<Integer>> graph;
-	static boolean[] bfsvisited;
-	static boolean[] dfsvisited;
-	static boolean[] existed;
+	static ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
 
-	public static void main(String arg[]) throws IOException {
+	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		int vertices = Integer.valueOf(st.nextToken());
-		int edges = Integer.valueOf(st.nextToken());
-		int start = Integer.valueOf(st.nextToken());
-		bfsvisited = new boolean[vertices + 1];
-		dfsvisited = new boolean[vertices + 1];
-		existed = new boolean[vertices + 1];
-		graph = new ArrayList<>();
-		for (int i = 0; i <= vertices; i++) {
-			graph.add(new ArrayList<Integer>());
+		int N = Integer.valueOf(st.nextToken()); // 노드 개수
+		int M = Integer.valueOf(st.nextToken()); // 간선 개수
+		int start = Integer.valueOf(st.nextToken()); // 시작 노드 번호
+
+		for (int i = 0; i <= N; i++) {
+			graph.add(new ArrayList<>());
 		}
-		// 그래프 및 존재여부 값 지정
-		for (int i = 0; i < edges; i++) {
+
+		for (int i = 0; i < M; i++) {
 			st = new StringTokenizer(br.readLine());
 			int from = Integer.valueOf(st.nextToken());
 			int to = Integer.valueOf(st.nextToken());
+
 			graph.get(from).add(to);
 			graph.get(to).add(from);
-			existed[from] = true;
-			existed[to] = true;
 		}
-		// 연결된 노드 오름차순 정렬
-		for (int i = 1; i <= vertices; i++) {
-			Collections.sort(graph.get(i));
-		}
-		// dfs/bfs 실행
-		
-		if(existed[start]) {
-			dfs(start);
-			System.out.println();
-			bfs(start);
-		}
-		else {
-			System.out.println(start);
-			System.out.println(start);
-		}
+
+		System.out.println(dfs(start));
+		System.out.println(bfs(start));
 		br.close();
 	}
-	//dfs 구현부
-	static void dfs(int from) {
-		dfsvisited[from] = true;
-		System.out.print(from+" ");
-		for (int i = 0; i < graph.get(from).size(); i++) {
-			if (!dfsvisited[graph.get(from).get(i)]) {
-				dfs(graph.get(from).get(i));
+
+	public static String dfs(int start) {
+		StringBuilder sb = new StringBuilder();
+		boolean[] visited = new boolean[graph.size() + 1];
+
+		dfs(start, visited, sb);
+
+		return sb.deleteCharAt(sb.length() - 1).toString();
+	}
+
+	public static void dfs(int from, boolean visited[], StringBuilder sb) {	//dfs를 실행하는 메소드 (시작점, 방문배열, 방문한 노드 문자열)
+		if (visited[from]) {
+			return;
+		}
+		visited[from] = true;
+		sb.append(from).append(" ");
+		PriorityQueue<Integer> nextPQ = new PriorityQueue<>(); //작은 노드 부터 방문하기 위한 우선순위 큐
+
+		for (int to : graph.get(from)) {
+			if (visited[to]) {
+				continue;
 			}
+			nextPQ.add(to);
+		}
+
+		while (!nextPQ.isEmpty()) { //작은 노드부터 방문
+			dfs(nextPQ.poll(), visited, sb);
 		}
 	}
-	//bfs 구현부, bfs는 재귀로 하면 알고리즘이 어려우니 반복문으로 구현
-	static void bfs(int from) {
-		bfsvisited[from] = true;
-		Queue<Integer> next = new LinkedList<>();
-		next.add(from);
-		
-		while(!next.isEmpty()) {
-			int nextNode = next.poll();
-			System.out.print(nextNode+" ");
-			for (int i = 0; i < graph.get(nextNode).size(); i++) {
-				if (!bfsvisited[graph.get(nextNode).get(i)]) {
-					bfsvisited[graph.get(nextNode).get(i)] = true;
-					next.add(graph.get(nextNode).get(i));
+
+	public static String bfs(int start) { //bfs를 실행하는 메소드 (시작점)
+		StringBuilder sb = new StringBuilder();
+		boolean visited[] = new boolean[graph.size() + 1];
+		Queue<Integer> q = new LinkedList<>();
+
+		q.add(start);
+		sb.append(start).append(" ");
+		while (!q.isEmpty()) {
+			int from = q.poll();
+			visited[from] = true;
+
+			PriorityQueue<Integer> nextPQ = new PriorityQueue<>();	//작은 노드 부터 방문하기 위한 우선순위 큐
+
+			for (int to : graph.get(from)) {
+				if (visited[to]) {
+					continue;
 				}
+
+				visited[to] = true;
+				nextPQ.add(to);
+			}
+
+			while (!nextPQ.isEmpty()) {	//작은 노드부터 방문
+				int next = nextPQ.poll();
+				sb.append(next).append(" ");
+				q.add(next);
 			}
 		}
+
+		return sb.deleteCharAt(sb.length() - 1).toString();
 	}
 }
