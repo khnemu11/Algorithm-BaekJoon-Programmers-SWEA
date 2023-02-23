@@ -3,76 +3,69 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.StringTokenizer;
 
+/*
+	풀이 알고리즘
+	노드와 노드를 연결하여 루트의 개수를 구하는 문제 -> 유니온 파인드 이용하여 부모 노드 저장
+*/
 public class Main {
-	static List<List<Integer>>graph;
-	static boolean[]visited;
-	
-	public static void main(String arg[]) throws IOException {
+	static int parents[];
+
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		int vertices = Integer.valueOf(st.nextToken());
-		int edges = Integer.valueOf(st.nextToken());
-		graph = new ArrayList<>();
-		visited=new boolean[vertices+1];
-		int count=0;
-		
-		//그래프에 정점의 개수만큼 추가
-		
-		for(int i=0;i<=vertices;i++) {
-			graph.add(new ArrayList<>());
+		int N = Integer.valueOf(st.nextToken()); // 노드의 개수
+		int M = Integer.valueOf(st.nextToken()); // 간선의 개수
+		parents = new int[N + 1];
+
+		for (int i = 1; i <= N; i++) {
+			parents[i] = i; // 부모를 자기 자신으로 초기화
 		}
-		
-		//각 정점에 이어져있는 노드 추가
-		
-		for(int i=0;i<edges;i++) {
+
+		for (int i = 0; i < M; i++) {
 			st = new StringTokenizer(br.readLine());
 			int from = Integer.valueOf(st.nextToken());
 			int to = Integer.valueOf(st.nextToken());
-			
-			graph.get(from).add(to);
-			graph.get(to).add(from);
+
+			if (getParent(from) != getParent(to)) { // 노드1과 노드2의 부모가 다르면 병합
+				union(from, to);
+			}
+
 		}
-		//System.out.println(" >> "+graph.toString());
-		
-		//각 정점을 순회함
-		//이때 이미 순회한 정점이거나 자기 자신으로 시작하지 않는 정점이면 탐색하지 않는다.
-		//순회 1번 = 연결 요소 1개
-		
-		for(int i=1;i<=vertices;i++) {
-			if(visited[i] || graph.get(i).isEmpty())	continue;
-			//System.out.println("start "+i+" >> ");
-			
-			search(i);
-			count++;
+
+		HashSet<Integer> set = new HashSet<>(); // 중복되지 않는 부모의 set
+
+		for (int i = 1; i < parents.length; i++) {
+			getParent(i); // 부모 최신화
+			set.add(parents[i]);
 		}
-		//독립적인 정점(방문하지 않는 노드)도 연결요소로 취급한다.
-		for(int i=1;i<visited.length;i++) {
-			if(!visited[i])	count++;
-		}
-		
-		
-		bw.write(String.valueOf(count));
-		bw.newLine();
-		
+		bw.write(set.size() + "\n");
 		bw.flush();
 		bw.close();
 		br.close();
 	}
-	//연결 요소만큼 순회하는 매소드
-	public static void search(int start) {
-		visited[start]=true;
-		//System.out.println(" >> "+graph.get(start).toString());
-		for(int next : graph.get(start)) {
-			if(visited[next] || graph.get(next).isEmpty())	continue;
-				
-			search(next);
+
+	public static int getParent(int child) { // 부모를 구하는 메소드 (자식)
+		if (child == parents[child]) {
+			return child;
+		}
+		parents[child] = getParent(parents[child]);
+
+		return parents[child];
+	}
+
+	public static void union(int a, int b) { // 부모를 병합하는 메소드 (자식1, 자식2)
+		int pa = getParent(a);
+		int pb = getParent(b);
+
+		if (pa < pb) { // 자식 노드의 값이 작은 것을 우선순위로 부모로 설정
+			parents[pb] = pa;
+		} else {
+			parents[pa] = pb;
 		}
 	}
 }
-
