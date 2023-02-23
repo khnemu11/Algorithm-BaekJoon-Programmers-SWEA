@@ -22,7 +22,7 @@ class Solution {
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		int N = Integer.valueOf(st.nextToken()); // 높이
 		int M = Integer.valueOf(st.nextToken()); // 너비
-		maxRange = Integer.valueOf(st.nextToken()); // 너비
+		maxRange = Integer.valueOf(st.nextToken()); //최대 사거리
 
 		originalMap = new int[N + 1][M];
 
