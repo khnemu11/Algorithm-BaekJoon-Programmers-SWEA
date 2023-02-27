@@ -23,26 +23,25 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		PriorityQueue<Hill> pq = new PriorityQueue<>();
-		PriorityQueue<Coordinate> startQ = new PriorityQueue<>();
 		int N = Integer.valueOf(br.readLine());
 		Queue<Coordinate> coordQ = new LinkedList<>();
 		Queue<Long> hillQ = new LinkedList<>();
-
+		Coordinate start = null;
+		int startIdx = 0;
 		for (int i = 0; i < N; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			long col = Long.valueOf(st.nextToken());
 			long row = Long.valueOf(st.nextToken());
 			Coordinate curr = new Coordinate(row, col);
-			startQ.add(curr);
+
+			if (start == null || (start.row > curr.row && start.col > curr.col)) {
+				start = curr;
+				startIdx = i;
+			}
 			coordQ.add(curr);
 		}
-
-		Coordinate start = startQ.poll();
-
-		while (true) {
-			if (coordQ.peek().row == start.row && coordQ.peek().col == start.col) {
-				break;
-			}
+			
+		for (int i = 0; i < startIdx; i++) {
 			coordQ.add(coordQ.poll());
 		}
 
@@ -54,7 +53,7 @@ public class Main {
 				hillQ.add(end.col);
 			}
 		}
-
+		
 		while (!hillQ.isEmpty()) {
 			long left = hillQ.poll();
 			long right = hillQ.poll();
@@ -69,7 +68,6 @@ public class Main {
 
 		while (!pq.isEmpty()) {
 			Hill curr = pq.poll();
-
 			if (curr.left > outMax) { // 가장 바깥에 있는 애보다 큰경우
 				uncontained++;
 				uncontain++;
@@ -94,6 +92,11 @@ class Coordinate implements Comparable<Coordinate> {
 	public Coordinate(long row, long col) {
 		this.row = row;
 		this.col = col;
+	}
+
+	@Override
+	public String toString() {
+		return "Coordinate [row=" + row + ", col=" + col + "]";
 	}
 
 	@Override
