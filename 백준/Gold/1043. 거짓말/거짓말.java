@@ -1,96 +1,103 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
+/*
+	풀이 알고리즘
+	진실을 아는 사람이 포함된 파티에 참가하면 안됨
+	진실을 아는 사람이 있는 경우 해당 사람도 진실을 아는 사람으로 변경 -> bfs로 유니온-파인드 적용
+	해당 파티도 참가 불가
+*/
 public class Main {
+	static int parents[];
+	static boolean truth[];
+
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		int peopleN = Integer.valueOf(st.nextToken());
-		int partyN = Integer.valueOf(st.nextToken());
-
-		HashSet<Integer> truth = new HashSet<>();
-		st = new StringTokenizer(br.readLine());
-		int truthN = Integer.valueOf(st.nextToken());
-		boolean people[][] = new boolean[peopleN + 1][peopleN + 1];
-
-		for (int i = 0; i < truthN; i++) {
-			truth.add(Integer.valueOf(st.nextToken()));
-		}
-
+		int N = Integer.valueOf(st.nextToken()); // 사람 수
+		int M = Integer.valueOf(st.nextToken()); // 파티 수
+		parents = new int[N + 1];
 		ArrayList<ArrayList<Integer>> party = new ArrayList<>();
 
-		for (int i = 0; i < partyN; i++) {
-			party.add(new ArrayList<Integer>());
-
-			int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-			for (int k = 1; k < row.length; k++) {
-				party.get(i).add(row[k]);
-			}
-
-			for (int start = 0; start < party.get(i).size(); start++) {
-				for (int end = start + 1; end < party.get(i).size(); end++) {
-					people[party.get(i).get(start)][party.get(i).get(end)] = true;
-					people[party.get(i).get(end)][party.get(i).get(start)] = true;
-				}
-			}
+		for (int i = 1; i < parents.length; i++) { // 부모 노드 초기화
+			parents[i] = i;
+		}
+		for (int i = 0; i <= M; i++) { // 파티 리스트 초기화
+			party.add(new ArrayList<>());
 		}
 
-		Iterator<Integer> it = truth.iterator();
+		st = new StringTokenizer(br.readLine());
 
-		Queue<Integer> queue = new LinkedList<>();
-		while (it.hasNext()) {
-			int start = it.next();
+		int TruthNum = Integer.valueOf(st.nextToken()); // 진실을 아는 사람의 수
+		truth = new boolean[N + 1];
 
-			queue.add(start);
+		for (int i = 0; i < TruthNum; i++) {
+			int peopleIdx = Integer.valueOf(st.nextToken());
+			truth[peopleIdx] = true; // 진실을 아는사람 추기화
 		}
 
-		boolean visited[] = new boolean[peopleN + 1];
+		for (int partyIdx = 1; partyIdx <= M; partyIdx++) {
+			st = new StringTokenizer(br.readLine());
+			int partyNum = Integer.valueOf(st.nextToken());
 
-		while (!queue.isEmpty()) {
-			int curr = queue.poll();
-			visited[curr] = true;
-			for (int i = 1; i < people.length; i++) {
-				if (visited[i]) {
-					continue;
-				}
+			for (int i = 0; i < partyNum; i++) { // 해당 파티에 사람 인덱스 추가
+				party.get(partyIdx).add(Integer.valueOf(st.nextToken()));
+			}
 
-				if (people[curr][i]) {
-					truth.add(i);
-					queue.add(i);
-				}
+			for (int i = 0; i < partyNum - 1; i++) {
+				union(party.get(partyIdx).get(i), party.get(partyIdx).get(i + 1)); // 모든 파티원 병합
 			}
 		}
-//		System.out.println(Arrays.deepToString(people));
-//		System.out.println(party.toString());
-//		System.out.println(truth.toString());
 
-		int count = 0;
-		for (int i = 0; i < partyN; i++) {
-			boolean isValid = true;
-			for (int k = 0; k < party.get(i).size(); k++) {
-				if (truth.contains(party.get(i).get(k))) {
-					isValid = false;
+		int partyNum = 0;
+
+		for (int partyIdx = 1; partyIdx < party.size(); partyIdx++) {
+			boolean canEnterParty = true;
+			for (int peopleIdx : party.get(partyIdx)) {
+				if (truth[getParent(peopleIdx)]) {	//파티원의 부모가 진실을 아는 사람이면 참가 못함
+					canEnterParty = false;
 					break;
 				}
 			}
 
-			if (isValid) {
-				count++;
+			if (canEnterParty) {
+				partyNum++;
 			}
 		}
-		bw.write(String.valueOf(count));
-		bw.flush();
+
+		System.out.println(partyNum);
+
 	}
 
+	public static int getParent(int child) {
+		if (parents[child] == child) {
+			return child;
+		}
+
+		parents[child] = getParent(parents[child]);
+
+		return parents[child];
+
+	}
+
+	public static void union(int a, int b) {
+		int pa = getParent(a);
+		int pb = getParent(b);
+
+		if (pa < pb) {
+			parents[pb] = pa;
+		} else {
+			parents[pa] = pb;
+		}
+		if (truth[pa] || truth[pb]) { // 진실을 아는 부모 노드면 둘다 참으로 변경
+			truth[pa] = true;
+			truth[pb] = true;
+		}
+	}
 }
