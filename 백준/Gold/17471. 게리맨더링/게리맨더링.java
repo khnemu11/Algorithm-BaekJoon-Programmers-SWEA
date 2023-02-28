@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /*
@@ -10,9 +9,9 @@ import java.util.StringTokenizer;
 	최대 고르는 수 : N/2
 	조합으로 해결
 	먼저 지역구를 고르고 나머지 지역구가 모두 연결되어 있는지 확인
-	-> 나머지 지역구 중 한개를 dfs로 돌려 나머지를 모두 방문하는지 확인
+	-> 지역구 2개를 dfs로 돌려 나머지를 모두 방문하는지 확인
 	
-	걸린시간 : 
+	걸린시간 : 38분
 */
 public class Main {
 	static ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
@@ -65,10 +64,8 @@ public class Main {
 				return;
 			}
 			visited = new boolean[N + 1];
-//			System.out.println(Arrays.toString(citiesA));
 			for (int i = 1; i < citiesA.length; i++) {
 				if (citiesA[i]) { // A의 도시인 경우
-//					System.out.println("A : " + i);
 					makeRouteA(i);
 					break;
 				}
@@ -76,7 +73,6 @@ public class Main {
 
 			for (int i = 1; i < citiesA.length; i++) {
 				if (!citiesA[i]) { // B의 도시인 경우
-//					System.out.println("B : " + i);
 					makeRouteB(i);
 					break;
 				}
@@ -99,7 +95,6 @@ public class Main {
 					b += populationArr[i];
 				}
 			}
-//			System.out.println(a + " vs " + b);
 			minDiffer = Math.min(minDiffer, Math.abs(a - b));
 		} else {
 			pick(idx + 1, cnt, sumA);
