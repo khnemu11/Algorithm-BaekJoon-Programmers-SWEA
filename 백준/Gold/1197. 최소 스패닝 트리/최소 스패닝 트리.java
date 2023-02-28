@@ -9,6 +9,8 @@ import java.util.StringTokenizer;
 	풀이 알고리즘
 	mst문제
 	정점의 개수(10,000)가 간선(100,000)보다 작음 ->프림
+	
+	걸린시간 : 5분 18초
 */
 public class Main {
 	public static void main(String[] args) throws IOException {
@@ -35,13 +37,13 @@ public class Main {
 		}
 
 		int start = 1; // 1 정점부터 시작
-		PriorityQueue<Node> q = new PriorityQueue<>();
+		PriorityQueue<Node> q = new PriorityQueue<>();	//가중치에 따라 정렬한 큐
 		q.add(new Node(start, 0));
 
-		int cnt = 0;
+		int cnt = 0; // 방문한 노드 개수
 		int cost = 0;
 
-		while (!q.isEmpty()) {
+		while (!q.isEmpty()) {	//프림 알고리즘 시작
 			Node curr = q.poll();
 
 			if (visited[curr.val]) {
@@ -52,7 +54,7 @@ public class Main {
 			cost += curr.cost;
 			cnt++;
 
-			if (cnt == V) {
+			if (cnt == V) { // 방문한 노드의 개수가 노드의 개수와 같다면 프림 탈출
 				break;
 			}
 
