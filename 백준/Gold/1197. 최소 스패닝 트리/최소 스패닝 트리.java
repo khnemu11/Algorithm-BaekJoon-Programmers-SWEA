@@ -1,87 +1,84 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.PriorityQueue;
+import java.util.StringTokenizer;
 
+/*
+	풀이 알고리즘
+	mst문제
+	정점의 개수(10,000)가 간선(100,000)보다 작음 ->프림
+*/
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-		int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-		int V = row[0];
-		int E = row[1];
+		int V = Integer.valueOf(st.nextToken());
+		int E = Integer.valueOf(st.nextToken());
+
 		boolean visited[] = new boolean[V + 1];
-
-		ArrayList<ArrayList<Vertex>> graph = new ArrayList<>();
-
+		ArrayList<ArrayList<Node>> graph = new ArrayList<>();
 		for (int i = 0; i <= V; i++) {
 			graph.add(new ArrayList<>());
 		}
 
-		Vertex min = new Vertex(1, Integer.MAX_VALUE);
-
 		for (int i = 0; i < E; i++) {
-			row = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-			graph.get(row[0]).add(new Vertex(row[1], row[2]));
-			graph.get(row[1]).add(new Vertex(row[0], row[2]));
-			if (min.cost > row[2]) {
-				min = new Vertex(row[0], row[2]);
-			}
+			st = new StringTokenizer(br.readLine());
+			int from = Integer.valueOf(st.nextToken());
+			int to = Integer.valueOf(st.nextToken());
+			int cost = Integer.valueOf(st.nextToken());
+
+			graph.get(from).add(new Node(to, cost));
+			graph.get(to).add(new Node(from, cost));
 		}
 
-		PriorityQueue<Vertex> queue = new PriorityQueue<>();
+		int start = 1; // 1 정점부터 시작
+		PriorityQueue<Node> q = new PriorityQueue<>();
+		q.add(new Node(start, 0));
 
-		for (int i = 0; i < graph.get(min.no).size(); i++) {
-			queue.offer(graph.get(min.no).get(i));
-		}
-		visited[min.no] = true;
-		int weight = 0;
+		int cnt = 0;
+		int cost = 0;
 
-		while (!queue.isEmpty()) {
-			Vertex curr = queue.poll();
-			if (visited[curr.no]) {
+		while (!q.isEmpty()) {
+			Node curr = q.poll();
+
+			if (visited[curr.val]) {
 				continue;
 			}
-			visited[curr.no] = true;
-			weight += curr.cost;
 
-			for (int i = 0; i < graph.get(curr.no).size(); i++) {
-				Vertex next = graph.get(curr.no).get(i);
+			visited[curr.val] = true;
+			cost += curr.cost;
+			cnt++;
 
-				if (visited[next.no]) {
+			if (cnt == V) {
+				break;
+			}
+
+			for (Node to : graph.get(curr.val)) {
+				if (visited[to.val]) {
 					continue;
 				}
-
-				queue.offer(next);
+				q.add(to);
 			}
 		}
-		bw.write(String.valueOf(weight));
-		bw.newLine();
-		bw.flush();
+
+		System.out.println(cost);
 	}
 }
 
-class Vertex implements Comparable<Vertex> {
-	int no;
+class Node implements Comparable<Node> {
+	int val;
 	int cost;
 
-	public Vertex(int no, int cost) {
-		this.no = no;
+	public Node(int val, int cost) {
+		this.val = val;
 		this.cost = cost;
 	}
 
 	@Override
-	public String toString() {
-		return "Vertex [no=" + no + ", cost=" + cost + "]";
-	}
-
-	@Override
-	public int compareTo(Vertex o) {
+	public int compareTo(Node o) {
 		return this.cost - o.cost;
 	}
 }
