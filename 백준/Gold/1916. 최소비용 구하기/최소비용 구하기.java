@@ -1,94 +1,76 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
-public class Main {
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+/*
+ * 풀이 알고리즘
 
-		int node = Integer.valueOf(br.readLine());
-		int edge = Integer.valueOf(br.readLine());
+*	두 점간의 최소비용 -> 다익스트라
+*/
+public class Main {
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int V = Integer.valueOf(br.readLine());
+		int E = Integer.valueOf(br.readLine());
+
 		ArrayList<ArrayList<Node>> graph = new ArrayList<>();
 
-		for (int i = 0; i <= node; i++) {
+		for (int i = 0; i <= V; i++) {
 			graph.add(new ArrayList<Node>());
 		}
 
-		for (int i = 0; i < edge; i++) {
+		for (int i = 0; i < E; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
-
-			int start = Integer.valueOf(st.nextToken());
-			int end = Integer.valueOf(st.nextToken());
+			int from = Integer.valueOf(st.nextToken());
+			int to = Integer.valueOf(st.nextToken());
 			int cost = Integer.valueOf(st.nextToken());
 
-			graph.get(start).add(new Node(end, cost));
+			graph.get(from).add(new Node(to, cost));
 		}
-
 		StringTokenizer st = new StringTokenizer(br.readLine());
-
 		int start = Integer.valueOf(st.nextToken());
 		int end = Integer.valueOf(st.nextToken());
 
-		PriorityQueue<Node> queue = new PriorityQueue<>();
-		queue.add(new Node(start, 0));
-		
-		boolean visited[] = new boolean[node + 1];
-		int distance[] = new int[node + 1];
-		
-		Arrays.fill(distance, Integer.MAX_VALUE);
+		int distance[] = new int[V + 1];
+		int INF = 100_000_000;
+		Arrays.fill(distance, INF);
 		distance[start] = 0;
-		
-		while (!queue.isEmpty()) {
-			Node curr = queue.poll();
+		PriorityQueue<Node> pq = new PriorityQueue<>();
+		pq.add(new Node(start, 0));
 
-			if (visited[curr.node]) {
+		while (!pq.isEmpty()) {
+			Node from = pq.poll();
+			
+			if (from.cost > distance[from.val]) {
 				continue;
 			}
 
-			visited[curr.node] = true;
-
-			for (Node next : graph.get(curr.node)) {
-				if (curr.cost + next.cost < distance[next.node]) {
-					distance[next.node] = curr.cost + next.cost;
-					queue.add(new Node(next.node, distance[next.node]));
+			for (Node to : graph.get(from.val)) {
+				if (distance[to.val] > distance[from.val] + to.cost) {
+					distance[to.val] = distance[from.val] + to.cost;
+					pq.add(new Node(to.val, distance[to.val]));
 				}
 			}
-			
 		}
-
-		bw.write(String.valueOf(distance[end]));
-		bw.newLine();
-		bw.flush();
-
-		br.close();
-		bw.close();
+		System.out.println(distance[end]);
 	}
-
 }
 
 class Node implements Comparable<Node> {
-	int node;
+	int val;
 	int cost;
 
-	public Node(int node, int cost) {
-		this.node = node;
-
+	public Node(int val, int cost) {
+		this.val = val;
 		this.cost = cost;
 	}
 
 	@Override
 	public int compareTo(Node o) {
-		if (this.cost < o.cost) {
-			return -1;
-		} else {
-			return 1;
-		}
+		return this.cost - o.cost;
 	}
 }
