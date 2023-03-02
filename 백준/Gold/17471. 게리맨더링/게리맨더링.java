@@ -85,17 +85,8 @@ public class Main {
 				}
 			}
 
-			int a = 0;
-			int b = 0;
 
-			for (int i = 1; i < citiesA.length; i++) {
-				if (citiesA[i]) {
-					a += populationArr[i];
-				} else {
-					b += populationArr[i];
-				}
-			}
-			minDiffer = Math.min(minDiffer, Math.abs(a - b));
+			minDiffer = Math.min(minDiffer, Math.abs(sumA  - (total- sumA)));
 		} else {
 			pick(idx + 1, cnt, sumA);
 
