@@ -1,117 +1,115 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
- 
-class Node implements Comparable<Node> {
-    int end;
-    int weight;
- 
-    Node(int end, int weight) {
-        this.end = end;
-        this.weight = weight;
-    }
- 
-    @Override
-    public int compareTo(Node o) {
-        return weight - o.weight;
-    }
- 
-}
- 
+
+/*
+ * 풀이 알고리즘
+	두 점과의 최소거리 -> 다익스트라
+	임의의 두점 a,b를 무조건 지나야함
+	경로는 2개가 나타남
+	
+	시작 -> a -> b ->도착
+	시작 -> b -> a ->도착
+	
+	구해야할 다익스트라를 적용할 최단거리 연산
+	
+	시작 -> a
+	시작 -> b
+	b -> a
+	a -> b 
+	a -> 도착
+	b -> 도착
+*/
 public class Main {
-    static int N, E;
-    static ArrayList<ArrayList<Node>> a; // 인접리스트.
-    static int[] dist; // 시작점에서 각 정점으로 가는 최단거리.
-    static boolean[] check; // 방문 확인.
-    static final int INF = 200000000;
- 
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        E = Integer.parseInt(st.nextToken());
- 
-        a = new ArrayList<>();
-        dist = new int[N + 1];
-        check = new boolean[N + 1];
- 
-        Arrays.fill(dist, INF);
- 
-        for (int i = 0; i <= N; i++) {
-            a.add(new ArrayList<>());
-        }
- 
-        // 양방향 인접 리스트 구현.
-        for (int i = 0; i < E; i++) {
-            st = new StringTokenizer(br.readLine());
-            int start = Integer.parseInt(st.nextToken());
-            int end = Integer.parseInt(st.nextToken());
-            int weight = Integer.parseInt(st.nextToken());
- 
-            // start에서 end로 가는 weight (가중치)
-            a.get(start).add(new Node(end, weight));
- 
-            // end에서 start로 가는 weight (가중치)
-            a.get(end).add(new Node(start, weight));
-        }
- 
-        // 반드시 거쳐야 하는 정점.
-        st = new StringTokenizer(br.readLine());
-        int v1 = Integer.parseInt(st.nextToken());
-        int v2 = Integer.parseInt(st.nextToken());
- 
-        // 1 -> v1 -> v2 -> N으로 가는 경우
-        int res1 = 0;
-        res1 += dijkstra(1, v1);
-        res1 += dijkstra(v1, v2);
-        res1 += dijkstra(v2, N);
- 
-        // 1 -> v2 -> v1 -> N으로 가는 경우
-        int res2 = 0;
-        res2 += dijkstra(1, v2);
-        res2 += dijkstra(v2, v1);
-        res2 += dijkstra(v1, N);
- 
-        int ans = (res1 >= INF && res2 >= INF) ? -1 : Math.min(res1, res2);
- 
-        bw.write(ans + "\n");
-        bw.flush();
-        bw.close();
-        br.close();
-    }
- 
-    // 다익스트라 알고리즘
-    public static int dijkstra(int start, int end) {
-        Arrays.fill(dist, INF);
-        Arrays.fill(check, false);
- 
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        boolean[] check = new boolean[N + 1];
-        pq.offer(new Node(start, 0));
-        dist[start] = 0;
- 
-        while (!pq.isEmpty()) {
-            Node curNode = pq.poll();
-            int cur = curNode.end;
- 
-            if (!check[cur]) {
-                check[cur] = true;
- 
-                for (Node node : a.get(cur)) {
-                    if (!check[node.end] && dist[node.end] > dist[cur] + node.weight) {
-                        dist[node.end] = dist[cur] + node.weight;
-                        pq.add(new Node(node.end, dist[node.end]));
-                    }
-                }
-            }
-        }
- 
-        return dist[end];
-    }
+	static ArrayList<ArrayList<Node>> graph = new ArrayList<>();
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		int N = Integer.valueOf(st.nextToken()); // 노드의 개수
+		int E = Integer.valueOf(st.nextToken()); // 간선의 개수
+		int start = 1;
+		int end = N;
+		int INF = 200_000_000;
+
+		for (int i = 0; i <= N; i++) {
+			graph.add(new ArrayList<>());
+		}
+
+		for (int i = 0; i < E; i++) {
+			st = new StringTokenizer(br.readLine());
+			int from = Integer.valueOf(st.nextToken());
+			int to = Integer.valueOf(st.nextToken());
+			int cost = Integer.valueOf(st.nextToken());
+
+			graph.get(from).add(new Node(to, cost));
+			graph.get(to).add(new Node(from, cost));
+		}
+
+		st = new StringTokenizer(br.readLine());
+		int a = Integer.valueOf(st.nextToken());
+		int b = Integer.valueOf(st.nextToken());
+
+		int startToA = getMinCost(start, a);
+		int startToB = getMinCost(start, b);
+		int AToB = getMinCost(a, b);
+		int BToA = getMinCost(b, a);
+		int AToEnd = getMinCost(a, end);
+		int BToEnd = getMinCost(b, end);
+
+		int minCost = Math.min(startToA + AToB + BToEnd, startToB + BToA + AToEnd);
+
+		if (minCost >= INF) {
+			System.out.println(-1);
+		} else {
+			System.out.println(minCost);
+		}
+	}
+
+	public static int getMinCost(int start, int end) {
+		int distance[] = new int[graph.size()];
+		int INF = 200_000_000;
+
+		Arrays.fill(distance, INF);
+		distance[start] = 0;
+
+		PriorityQueue<Node> pq = new PriorityQueue<>();
+		pq.add(new Node(start, 0));
+
+		while (!pq.isEmpty()) {
+			Node from = pq.poll();
+
+			if (from.cost > distance[from.val]) {
+				continue;
+			}
+
+			for (Node to : graph.get(from.val)) {
+				if (distance[to.val] > distance[from.val] + to.cost) {
+					distance[to.val] = distance[from.val] + to.cost;
+					pq.add(new Node(to.val, distance[to.val]));
+				}
+			}
+		}
+
+		return distance[end];
+	}
+}
+
+class Node implements Comparable<Node> {
+	int val;
+	int cost;
+
+	public Node(int val, int cost) {
+		this.val = val;
+		this.cost = cost;
+	}
+
+	@Override
+	public int compareTo(Node o) {
+		return this.cost - o.cost;
+	}
 }
