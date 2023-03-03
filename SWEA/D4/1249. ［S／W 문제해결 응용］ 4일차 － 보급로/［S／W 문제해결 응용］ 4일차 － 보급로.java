@@ -6,97 +6,77 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
-/*
- * 풀이 알고리즘
- * 
- * 	0) 문제 목표
- * 	  시작점부터 끝점까지의 총 복구시간이 짧은 것
- *    -> 최단거리, 다익스트라
- *    E = N^2 = 100,000 <-nlogn가능
- *    
- *    
-*/
 public class Solution {
-	public static void main(String[] args) throws NumberFormatException, IOException {
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
 		int T = Integer.valueOf(br.readLine());
-		int upDown[] = { -1, 1, 0, 0 };
-		int leftRight[] = { 0, 0, -1, 1 };
 
-		for (int testcase = 1; testcase <= T; testcase++) {
+		for (int test_case = 1; test_case <= T; test_case++) {
 			int N = Integer.valueOf(br.readLine());
-
-			int map[][] = new int[N][N];
-			for (int i = 0; i < map.length; i++) {
-				int input[] = Arrays.stream(br.readLine().split("")).mapToInt(x -> Integer.valueOf(x)).toArray();
-				for (int j = 0; j < map[0].length; j++) {
-					map[i][j] = input[j];
-				}
+			boolean visited[][] = new boolean[N][N];
+			int cost[][] = new int[N][N];
+			int graph[][] = new int[N][N];
+			for (int i = 0; i < N; i++) {
+				graph[i] = Arrays.stream(br.readLine().split("")).mapToInt(x -> Integer.valueOf(x)).toArray();
+				Arrays.fill(cost[i], 100000000);
 			}
+
+			cost[0][0] = 0;
+			PriorityQueue<Coordinate> pq = new PriorityQueue<>();
+			pq.add(new Coordinate(0, 0));
 			Coordinate start = new Coordinate(0, 0);
-			Coordinate end = new Coordinate(N - 1, N - 1);
-
-			PriorityQueue<Road> pq = new PriorityQueue<>();
-			int distance[][] = new int[N + 1][N + 1];
-			int INF = 200_000;
-			for (int i = 0; i <= N; i++) {
-				Arrays.fill(distance[i], INF);
-			}
-
-			distance[start.row][start.col] = 0;
-			pq.add(new Road(start.row, start.col, distance[start.row][start.col]));
 
 			while (!pq.isEmpty()) {
-				Road mid = pq.poll();
-
-				if (distance[mid.row][mid.col] < mid.depth) {
+				Coordinate mid = pq.poll();
+				if (visited[mid.row][mid.col]) {
 					continue;
 				}
+				visited[mid.row][mid.col] = true;
+
+				int upDown[] = { -1, 0, 0, 1 };
+				int leftRight[] = { 0, -1, 1, 0 };
 
 				for (int k = 0; k < upDown.length; k++) {
 					Coordinate next = new Coordinate(mid.row + upDown[k], mid.col + leftRight[k]);
 
-					if (next.row < 0 || next.col < 0 || next.row >= map.length || next.col >= map[0].length) {
+					if (next.row < 0 || next.col < 0 || next.row >= graph.length || next.col >= graph.length
+							|| visited[next.row][next.col]) {
 						continue;
 					}
 
-					if (distance[next.row][next.col] > distance[mid.row][mid.col] + map[next.row][next.col]) {
-						distance[next.row][next.col] = distance[mid.row][mid.col] + map[next.row][next.col];
-						pq.add(new Road(next.row, next.col, distance[next.row][next.col]));
+					if (cost[next.row][next.col] > cost[mid.row][mid.col] + graph[mid.row][mid.col]) {
+						cost[next.row][next.col] = cost[mid.row][mid.col] + graph[mid.row][mid.col];
+						next.val = cost[next.row][next.col];
+						pq.add(next);
 					}
 				}
+
 			}
-			bw.write("#" + testcase + " " + distance[end.row][end.col] + "\n");
+
+			StringBuilder sb = new StringBuilder();
+			sb.append("#" + test_case + " " + cost[N - 1][N - 1]);
+			bw.write(sb.toString());
+			bw.newLine();
 		}
 
-		bw.flush(); // 결과 출력
-		br.close();
-		bw.close();
+		bw.flush();
 	}
 }
 
-class Coordinate {
+class Coordinate implements Comparable<Coordinate> {
 	int row;
 	int col;
+	int val;
 
 	public Coordinate(int row, int col) {
 		this.row = row;
 		this.col = col;
 	}
-}
-
-class Road extends Coordinate implements Comparable<Road> {
-	int depth;
-
-	public Road(int row, int col, int depth) {
-		super(row, col);
-		this.depth = depth;
-	}
 
 	@Override
-	public int compareTo(Road o) {
-		return this.depth - o.depth;
+	public int compareTo(Coordinate o) {
+
+		return this.val - o.val;
 	}
 }
