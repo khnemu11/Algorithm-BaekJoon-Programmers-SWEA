@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /*
@@ -12,8 +11,6 @@ import java.util.StringTokenizer;
  * 
  *  0) 문제 목표
  *    벌꿀을 가로로 M개의 연속된 벌통을 겹치지 않게 2번 골라 C개가 넘지않는 합 N의 최대값
- * 	
- * 
  * 
  *  1) 시간 복잡도
  *     제한 시간 : 3/50 = 약 0.06초 = 6,000,000
@@ -22,7 +19,6 @@ import java.util.StringTokenizer;
  *     
  *     	(a,b)와 (b,a) 선택은 같으므로 해당 부분을 처리하면 /2 연산 가능
  *     	10*10*10*10*(/2)*2^5 = 160,000
- *     
  *     -> 시간 내에 가능
  *     
  *  2) 구현해야할 기능
@@ -30,10 +26,10 @@ import java.util.StringTokenizer;
  *      벌통안에 속해있는 모든 꿀의 합, 단 C보다 작아야함
 */
 public class Solution {
-	static int map[][];
-	static int M, C;
-	static int maxHoney[];
-	static int maxHoneySum;
+	static int map[][]; // 벌꿀을 저장하는 배열
+	static int M, C; // 꿀통의 크기, 최대 꿀크기
+	static int maxHoney[]; // 농부 별 최대 꿀 수확 크기
+	static int maxHoneySum; // 농부 별 최대 꿀 수확 크기의 합
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -57,7 +53,7 @@ public class Solution {
 				}
 			}
 
-			pickBasket(new Coordinate[2], new Coordinate(0, -M), 0);
+			pickBasket(new Coordinate[2], new Coordinate(0, -M), 0); // 시작점이 열+M이 0이 되도록 좌표 시작점 설정
 
 			bw.write("#" + testcase + " " + maxHoneySum + "\n");
 		}
@@ -67,18 +63,18 @@ public class Solution {
 		bw.close();
 	}
 
-	public static void pickBasket(Coordinate coords[], Coordinate start, int idx) {
+	public static void pickBasket(Coordinate coords[], Coordinate start, int idx) { // 벌꿀통의 시작 인덱스를 고르는 메소드 (벌꿀 통 시작
+																					// 좌표배열, 선택 시작 좌표, 농부 인덱스)
 		if (idx == coords.length) {
-//			System.out.println(Arrays.toString(coords));
 			maxHoney = new int[2];
 
-			pickHoney(coords[0].col, coords[0], 0, 0, new ArrayList<Coordinate>());
-			pickHoney(coords[1].col, coords[1], 0, 1, new ArrayList<Coordinate>());
-//			System.out.println(Arrays.toString(maxHoney));
-			maxHoneySum = Math.max(maxHoneySum, maxHoney[0] + maxHoney[1]);
+			pickHoney(coords[0].col, coords[0], 0, 0, new ArrayList<Coordinate>()); // 농부 1의 최대 값
+			pickHoney(coords[1].col, coords[1], 0, 1, new ArrayList<Coordinate>()); // 농부 2의 최대값
+
+			maxHoneySum = Math.max(maxHoneySum, maxHoney[0] + maxHoney[1]); // 최대 매출 합 최신화
 		} else {
-			for (int i = start.row; i < map.length; i++) {
-				for (int j = i == start.row ? start.col + M : 0; j + M - 1 < map[0].length; j++) {
+			for (int i = start.row; i < map.length; i++) { // 시작 좌표부터 선택
+				for (int j = i == start.row ? start.col + M : 0; j + M - 1 < map[0].length; j++) { // 연속된 꿀통의 마지막 꿀통의 열값이 범위를 벗어나지 않을때 까지(행+ M-1<맵의 열크기)
 					coords[idx] = new Coordinate(i, j);
 					pickBasket(coords, coords[idx], idx + 1);
 				}
@@ -87,21 +83,21 @@ public class Solution {
 	}
 
 	public static void pickHoney(int colStart, Coordinate honey, int sum, int farmerIdx,
-			ArrayList<Coordinate> selected) {
+			ArrayList<Coordinate> selected) { // 시작 열, 현재 꿀 좌표, 꿀의 합, 농부 인덱스, 선택된 꿀의 좌표
 		if (honey.col == colStart + M) {
 			int squareSum = 0;
-			for (Coordinate coord : selected) {
+			for (Coordinate coord : selected) {	//선택된 꿀의 제곱의 합을 구하는 반복문
 				squareSum += map[coord.row][coord.col] * map[coord.row][coord.col];
 			}
-			maxHoney[farmerIdx] = Math.max(squareSum, maxHoney[farmerIdx]);
+			maxHoney[farmerIdx] = Math.max(squareSum, maxHoney[farmerIdx]);	//농부 별 꿀 최대값 갱신
 		} else {
 			Coordinate next = new Coordinate(honey.row, honey.col + 1);
-			pickHoney(colStart, next, sum, farmerIdx, selected);
+			pickHoney(colStart, next, sum, farmerIdx, selected);	//현재 꿀을 선택하지 않음
 
-			if (map[honey.row][honey.col] + sum <= C) {
-				selected.add(new Coordinate(honey.row, honey.col));
+			if (map[honey.row][honey.col] + sum <= C) {	//현재 꿀을 더했을때 최대 한계 C보다 작거나 같은경우(현재 꿀을 선택함)
+				selected.add(new Coordinate(honey.row, honey.col));	//꿀 선택
 				pickHoney(colStart, next, sum + map[honey.row][honey.col], farmerIdx, selected);
-				selected.remove(selected.size() - 1);
+				selected.remove(selected.size() - 1);	//꿀 제거
 			}
 		}
 	}
@@ -114,10 +110,5 @@ class Coordinate {
 	public Coordinate(int row, int col) {
 		this.row = row;
 		this.col = col;
-	}
-
-	@Override
-	public String toString() {
-		return "Coordinate [row=" + row + ", col=" + col + "]";
 	}
 }
