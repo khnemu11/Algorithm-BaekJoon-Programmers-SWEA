@@ -18,10 +18,11 @@ import java.util.StringTokenizer;
     왼쪽/오른쪽으로 구를 수 : 위->왼쪽->아래->오른쪽 / 위->오른족->아래->왼쪽
   deque 2개로 주사위를 구현
     바닥(아래)의 값을 바꾸려고 할 시 뒤쪽을 2번뺀 후 바닥 값을 넣 고 맨 뒤에있던 값을 넣는다.
-    위,아래,왼쪽,오른쪽,앞,뒤 
     
      위/아래로 구를 시 -> 왼쪽 오른쪽 값은 안바뀜 -> deque를 앞/뒤를 빼서 넣고 왼쪽/오른쪽 deque를 재설정
     왼쪽/오른쪽으로 구를 시 -> 위/아래 값은 안바뀜 -> deque를 왼/오를 빼서 넣고 위/아래deque를 재설정
+    
+    걸린 시간 : 1시간 9분
  */
 
 public class Main {
@@ -65,15 +66,12 @@ public class Main {
 		}
 
 		st = new StringTokenizer(br.readLine());
-//		System.out.println("TOP : " + TOP + " BOTTOM : " + BOTTOM + " LEFT : " + LEFT + " RIGHT : " + RIGHT
-//				+ " FRONT : " + FRONT + " BACK : " + BACK);
-//		int idx = 1;
+		
 		while (st.hasMoreTokens()) {
-//			System.out.println("#" + (idx++));
 			int command = Integer.valueOf(st.nextToken());
 			Coordinate next = new Coordinate(coord.row + upDown[command], coord.col + leftRight[command]);
 
-			if (next.row < 0 || next.col < 0 || next.row >= map.length || next.col >= map[0].length) {
+			if (next.row < 0 || next.col < 0 || next.row >= map.length || next.col >= map[0].length) {	//해당 방향으로 갈 수 있는지 확인
 				continue;
 			}
 			rotate(command);
@@ -82,37 +80,24 @@ public class Main {
 
 			coord = next;
 			numCopy();
-//			System.out.println("TOP : " + TOP + " BOTTOM : " + BOTTOM + " LEFT : " + LEFT + " RIGHT : " + RIGHT
-//					+ " FRONT : " + FRONT + " BACK : " + BACK);
-//			printArr();
-//			System.out.println("topLeftBottomRightQ " + topLeftBottomRightQ);
-//			System.out.println("topFrontBottomBackQ " + topFrontBottomBackQ);
-//			System.out.println();
 		}
 
 		bw.flush(); // 결과 출력
 		bw.close();
 	}
 
-	public static void printArr() {
-		for (int i = 0; i < map.length; i++) {
-			for (int j = 0; j < map[0].length; j++) {
-				System.out.print(map[i][j] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
-	public static void rotate(int command) {
-		if (command == 1 || command == 2) {
+	public static void rotate(int command) {	// 명령어 대로 회전하는 메소드 (방향)
+		if (command == 1 || command == 2) {	//왼쪽, 오른쪽인 경우
 			if (command == 1) { // 오른쪽
-				topLeftBottomRightQ.addLast(topLeftBottomRightQ.pollFirst());
+				topLeftBottomRightQ.addLast(topLeftBottomRightQ.pollFirst());	//오른쪽으로 돌면 left가 위로가 top이 되므로 현재 top을 맨 뒤(right)로 넣는다.
 
 			} else if (command == 2) { // 왼쪽
-				topLeftBottomRightQ.addFirst(topLeftBottomRightQ.pollLast());
+				topLeftBottomRightQ.addFirst(topLeftBottomRightQ.pollLast()); //오른쪽으로 돌면 right가 위로가 top이 되므로 현재 right를 맨 앞(top)으로 넣는다.
 			}
-
+			
+			//top,left,bottom,right의 값이 재설정되었으므로 최신화
+			//이때 front,back은 바뀌지 않았으므로 그대로
+			
 			TOP = topLeftBottomRightQ.getFirst();
 			topLeftBottomRightQ.addLast(topLeftBottomRightQ.pollFirst());
 			LEFT = topLeftBottomRightQ.getFirst();
@@ -121,20 +106,22 @@ public class Main {
 			topLeftBottomRightQ.addLast(topLeftBottomRightQ.pollFirst());
 			RIGHT = topLeftBottomRightQ.getFirst();
 			topLeftBottomRightQ.addLast(topLeftBottomRightQ.pollFirst());
-
+			
+			//top과 bottom이 바뀌었으므로 top->front->bottom->back의 deque를 재설정
 			topFrontBottomBackQ = new LinkedList<>();
 			topFrontBottomBackQ.add(TOP);
 			topFrontBottomBackQ.add(FRONT);
 			topFrontBottomBackQ.add(BOTTOM);
 			topFrontBottomBackQ.add(BACK);
-		} else if (command == 3 || command == 4) {
+		} else if (command == 3 || command == 4) {	//위, 아래로 도는 경우
 			if (command == 3) { // 위쪽
-				topFrontBottomBackQ.addLast(topFrontBottomBackQ.pollFirst());
+				topFrontBottomBackQ.addLast(topFrontBottomBackQ.pollFirst()); //위쪽으로 돌면 front가 위로가 top이 되므로 현재 top을 맨 뒤(back)로 넣는다.
 
 			} else if (command == 4) { // 아래쪽
-				topFrontBottomBackQ.addFirst(topFrontBottomBackQ.pollLast());
+				topFrontBottomBackQ.addFirst(topFrontBottomBackQ.pollLast());//아래쪽으로 돌면 back가 위로가 top이 되므로 현재 back를 맨 앞(top)으로 넣는다.
 			}
-//			System.out.println(topFrontBottomBackQ);
+			//top,FRONT,bottom,BACK의 값이 재설정되었으므로 최신화
+			//이때 left,right은 바뀌지 않았으므로 그대로
 			TOP = topFrontBottomBackQ.getFirst();
 			topFrontBottomBackQ.addLast(topFrontBottomBackQ.pollFirst());
 			FRONT = topFrontBottomBackQ.getFirst();
@@ -143,9 +130,8 @@ public class Main {
 			topFrontBottomBackQ.addLast(topFrontBottomBackQ.pollFirst());
 			BACK = topFrontBottomBackQ.getFirst();
 			topFrontBottomBackQ.addLast(topFrontBottomBackQ.pollFirst());
-
-//			System.out.println(topFrontBottomBackQ);
-
+			
+			//top과 bottom이 바뀌었으므로 top->left->bottom->right의 deque를 재설정
 			topLeftBottomRightQ = new LinkedList<>();
 			topLeftBottomRightQ.add(TOP);
 			topLeftBottomRightQ.add(LEFT);
@@ -155,23 +141,24 @@ public class Main {
 
 	}
 
-	public static void numCopy() {
-		if (map[coord.row][coord.col] == 0) {
+	public static void numCopy() {	//맵의 바닥의 숫자처리를 하는 메소드
+		if (map[coord.row][coord.col] == 0) {	//맵의 값이 0인경우 주사위의 바닥값을 저장
 			map[coord.row][coord.col] = BOTTOM;
-		} else {
-			BOTTOM = map[coord.row][coord.col];
-
+		} else {	//맵의 값이 0이 아닌경우
+			BOTTOM = map[coord.row][coord.col]; //주사위의 바닥 값을 재설정
+			//topLeftBottomRightQ의 바닥인 bottom 은 뒤에서 2번째에 있으므로 해당 값을 재설정
 			int right = topLeftBottomRightQ.pollLast();
 			topLeftBottomRightQ.pollLast();
 			topLeftBottomRightQ.addLast(BOTTOM);
 			topLeftBottomRightQ.addLast(right);
-
+			
+			//topFrontBottomBackQ의 바닥인 bottom 은 뒤에서 2번째에 있으므로 해당 값을 재설정
 			int back = topFrontBottomBackQ.pollLast();
 			topFrontBottomBackQ.pollLast();
 			topFrontBottomBackQ.addLast(BOTTOM);
 			topFrontBottomBackQ.addLast(back);
 
-			map[coord.row][coord.col] = 0;
+			map[coord.row][coord.col] = 0; //바닥의 숫자 제거
 		}
 	}
 }
