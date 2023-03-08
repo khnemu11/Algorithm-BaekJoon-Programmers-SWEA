@@ -1,76 +1,64 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.PriorityQueue;
+import java.io.*;
+import java.util.*;
 
+/*
+	풀이 알고리즘
+	
+	무게가 오름차순으로 보석을 정렬
+	무게를 오름차순으로 가방을 정렬
+	
+	현재 가방에 넣을 수 있는 보석을 전부 가격 maxHeap의 우선순위큐에 저장
+	현재 가격 중 가장 높은 것 꺼내기
+ */
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		int N = Integer.valueOf(st.nextToken()); // 보석 개수
+		int K = Integer.valueOf(st.nextToken()); // 가방 개수
 
-		int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-		int N = row[0];
-		int K = row[1];
-		ArrayList<Jewel> jewelList = new ArrayList<>();
+		PriorityQueue<Jewel> weightQueue = new PriorityQueue<>((x, y) -> (x.weight - y.weight));
+		PriorityQueue<Jewel> valQueue = new PriorityQueue<>((x, y) -> (y.val - x.val));
+		PriorityQueue<Integer> bagQueue = new PriorityQueue<>();
 
-		int[] bags = new int[K];
 		for (int i = 0; i < N; i++) {
-			row = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-			jewelList.add(new Jewel(row[1], row[0]));
+			st = new StringTokenizer(br.readLine());
+			int weight = Integer.valueOf(st.nextToken());
+			int val = Integer.valueOf(st.nextToken());
+			weightQueue.add(new Jewel(val, weight));
 		}
+
 		for (int i = 0; i < K; i++) {
-			bags[i] = Integer.valueOf(br.readLine());
+			bagQueue.add(Integer.valueOf(br.readLine()));
 		}
-		Collections.sort(jewelList);
-		Arrays.sort(bags);
+
 		long sum = 0;
-		PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
-		int jewelStart = 0;
-		for (int bag : bags) {
-			for (int i = jewelStart; i < jewelList.size(); i++) {
-				Jewel curr = jewelList.get(i);
-				if (bag < curr.weight) {
-					break;
-				}
-				pq.add(curr.cost);
-				jewelStart++;
+		while (!bagQueue.isEmpty()) {
+			int bagSize = bagQueue.poll();
+			while (!weightQueue.isEmpty() && weightQueue.peek().weight <= bagSize) {
+				valQueue.add(weightQueue.poll());
 			}
-			if (!pq.isEmpty()) {
-				sum += pq.poll();
+			if (!valQueue.isEmpty()) {
+				sum += valQueue.poll().val;
 			}
 		}
 
-		bw.write(String.valueOf(sum));
-		bw.newLine();
-		bw.flush();
+		System.out.println(sum);
 	}
 }
 
-class Jewel implements Comparable<Jewel> {
-	int cost;
+class Jewel {
+	int val;
 	int weight;
 
-	public Jewel(int cost, int weight) {
-		this.cost = cost;
+	public Jewel(int val, int weight) {
+		this.val = val;
 		this.weight = weight;
 	}
 
 	@Override
-	public int compareTo(Jewel o) {
-		if (o.weight == this.weight) {
-			return this.cost - o.cost;
-		}
-
-		return this.weight - o.weight;
-	}
-
-	@Override
 	public String toString() {
-		return "Jewel [cost=" + cost + ", weight=" + weight + "]";
+		return "Jewel [val=" + val + ", weight=" + weight + "]";
 	}
+
 }
