@@ -8,34 +8,33 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.Stack;
 import java.util.StringTokenizer;
+
 /*
-	풀이 과정
-	출발지 고정, 도착지까지 최소거리 -> 우선순위 큐를 이용한 다익스트라
-	경로를 기억해야 하므로 각 최소거리가 갱신될 때마다 부모를 저장
-*/
+	풀이 알고리즘
 
+	두 점과의 최소거리 -> 다익스트라
+	경로 역추적 -> 부모의 좌표를 각 노드의 최단경로가 갱신 될 때 마다 저장함
+ 	
+ */
 public class Main {
-	static ArrayList<ArrayList<Node>> graph;
-	static int distance[];
-	static int parents[];
-
-	public static void main(String[] args) throws NumberFormatException, IOException {
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
 		int N = Integer.valueOf(br.readLine());
-		int M = Integer.valueOf(br.readLine());
+		int E = Integer.valueOf(br.readLine());
 
-		graph = new ArrayList<>();
-		distance = new int[N + 1];
-		parents = new int[N + 1];
+		int parents[] = new int[N + 1];
+		ArrayList<ArrayList<Node>> graph = new ArrayList<>();
+
 		for (int i = 0; i <= N; i++) {
-			graph.add(new ArrayList<Node>());
+			graph.add(new ArrayList<>());
 			parents[i] = i;
 		}
 
-		for (int i = 0; i < M; i++) {
+		for (int i = 0; i < E; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
+
 			int from = Integer.valueOf(st.nextToken());
 			int to = Integer.valueOf(st.nextToken());
 			int cost = Integer.valueOf(st.nextToken());
@@ -43,71 +42,57 @@ public class Main {
 			graph.get(from).add(new Node(to, cost));
 		}
 
-		StringTokenizer st = new StringTokenizer(br.readLine());
+		StringTokenizer stringTokenizer = new StringTokenizer(br.readLine());
 
-		int start = Integer.valueOf(st.nextToken());
-		int end = Integer.valueOf(st.nextToken());
+		int start = Integer.valueOf(stringTokenizer.nextToken());
+		int end = Integer.valueOf(stringTokenizer.nextToken());
 
-		dajikstra(start);
+		PriorityQueue<Node> pQueue = new PriorityQueue<>();
+		int distance[] = new int[N + 1];
+		Arrays.fill(distance, 100_000_001);
+		distance[start] = 0;
+		pQueue.add(new Node(start, distance[start]));
 
-		int route[] = getRoute(end);
+		while (!pQueue.isEmpty()) { // 다익스트라를 이용한 최단경로 탐색
+			Node midNode = pQueue.poll();
+
+			if (distance[midNode.val] < midNode.cost) {
+				continue;
+			}
+
+			for (Node to : graph.get(midNode.val)) {
+				if (distance[to.val] > distance[midNode.val] + to.cost) {
+					parents[to.val] = midNode.val; // 자식의 부모를 현재 경유점으로 설정
+					distance[to.val] = distance[midNode.val] + to.cost;
+
+					pQueue.add(new Node(to.val, distance[to.val]));
+				}
+			}
+		}
+
+		int curr = end;
+		int length = 1;
+		Stack<Integer> stack = new Stack<>();
+
+		while (parents[curr] != curr) { // 경로 역추적
+			stack.add(curr);
+			curr = parents[curr];
+			length++;
+		}
+
+		StringBuilder sBuilder = new StringBuilder(start + " ");
+
+		while (!stack.isEmpty()) {
+			sBuilder.append(stack.pop() + " ");
+		}
 
 		bw.write(distance[end] + "\n");
-		bw.write(route.length + "\n");
-
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < route.length; i++) {
-			sb.append(route[i] + " ");
-		}
-		bw.write(sb.deleteCharAt(sb.length() - 1).toString() + "\n");
+		bw.write(length + "\n");
+		bw.write(sBuilder.toString() + "\n");
 
 		bw.flush();
 	}
 
-	public static void dajikstra(int start) {
-		PriorityQueue<Node> pq = new PriorityQueue<>();
-		pq.add(new Node(start, 0));
-
-		Arrays.fill(distance, 100_000_000);
-		distance[start] = 0;
-
-		while (!pq.isEmpty()) {
-			Node from = pq.poll();
-
-			if (from.cost > distance[from.val]) {
-				continue;
-			}
-
-			for (Node to : graph.get(from.val)) {
-				if (to.cost + distance[from.val] < distance[to.val]) {
-					distance[to.val] = to.cost + distance[from.val];
-					pq.add(new Node(to.val, distance[to.val]));
-					parents[to.val] = from.val;
-				}
-			}
-		}
-	}
-
-	public static int[] getRoute(int end) {
-		Stack<Integer> stack = new Stack<>();
-		int child = end;
-		while (parents[child] != child) {
-			stack.add(child);
-			child = parents[child];
-		}
-
-		stack.add(child);
-
-		int routes[] = new int[stack.size()];
-		int idx = 0;
-		while (!stack.isEmpty()) {
-			routes[idx] = stack.pop();
-			idx++;
-		}
-
-		return routes;
-	}
 }
 
 class Node implements Comparable<Node> {
@@ -115,6 +100,7 @@ class Node implements Comparable<Node> {
 	int cost;
 
 	public Node(int val, int cost) {
+		super();
 		this.val = val;
 		this.cost = cost;
 	}
@@ -123,4 +109,5 @@ class Node implements Comparable<Node> {
 	public int compareTo(Node o) {
 		return this.cost - o.cost;
 	}
+
 }
