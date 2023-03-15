@@ -1,15 +1,20 @@
+package defalut;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /*
 	풀이 알고리즘
 	
-	dfs 백트래킹으로 전부 확인
+	비숍을 오른쪽으로 한개씩 골라 대각선으로 겹치는 것이 있는 것을 가지치기하고 탐색하는 방법
+	전부 다 탐색한다고 가정 시 2^(N*N) = 2^100 -> 시간 초과
+	
+	검은색과 흰색의 칸은 서로 영향을 끼치지 않으므로 흰색과 검은색을 따로 시작
+	2^(N/2*N/2) * 2 -> 2^26 -> 시간내에 가능
  */
 public class Main {
 	static int map[][];
@@ -41,24 +46,16 @@ public class Main {
 				}
 			}
 		}
-		selectBishop(BLACK, 0, 0, 0); // 첫번째 칸을 검정으로
-		selectBishop(WHITE, 0, 0, 1); // 두번째 칸을 흰색으로
+		selectBishop(BLACK, 0, 0, 0);
+		selectBishop(WHITE, 0, 0, 1);
 
 		bw.write((max[0] + max[1]) + "\n");
 		bw.flush();
 	}
 
-	public static void printArr(boolean arr[][]) {
-		for (int i = 0; i < arr.length; i++) {
-			for (int j = 0; j < arr[0].length; j++) {
-				System.out.print(arr[i][j] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
-	public static void selectBishop(boolean color, int idx, int cnt, int colorIdx) {
+	public static void selectBishop(boolean color, int idx, int cnt, int colorIdx) { // 조건에 맞는 비숍을 선택하는 메소드 (색 참: 검은색,
+																						// 거짓, 흰색, 현재 비숍 좌표, 가능한 비숍 개수,
+																						// 현재 색의 인덱스)
 		max[colorIdx] = Math.max(max[colorIdx], cnt);
 
 		for (int i = idx; i < map.length * map.length; i++) {
@@ -73,7 +70,7 @@ public class Main {
 		}
 	}
 
-	public static boolean isInRange(Coordinate coord) {
+	public static boolean isInRange(Coordinate coord) { // 왼쪽 위 대각선으로 갈 때 겹치는 비숍이 있는지 확인하는 메소드
 		int upDown[] = { -1, -1 };
 		int leftRight[] = { -1, 1 };
 		for (int k = 0; k < upDown.length; k++) {
@@ -91,7 +88,7 @@ public class Main {
 		return false;
 	}
 
-	public static boolean outOfArray(int map[][], Coordinate coord) {
+	public static boolean outOfArray(int map[][], Coordinate coord) { // 배열 밖으로 좌표가 넘어가는지 확인하는 메소드
 		if (coord.row < 0 || coord.col < 0 || coord.row >= map.length || coord.col >= map[0].length) {
 			return true;
 		}
