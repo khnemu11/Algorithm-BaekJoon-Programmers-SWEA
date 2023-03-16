@@ -10,12 +10,8 @@ import java.util.HashMap;
 /*
 	풀이 알고리즘
 	
-	앞자리를 가장 크게해야함
-	
-	가장 먼저 등장한 숫자를 남은 숫자중 제일 큰 숫자로
-	만약 등장한 알파벳의 숫자가 같으면 다음 알파벳으로
-	해당 알파벳과 동일한 위치에 등장한 알파벳 중 이미 등장한 알파벳이 있다면 가장 큰값으로
-	
+	등장한 알파벳의 자리수를 기억해서 자리수의 합이 가장 큰것을 구해야함
+	즉 모든 자리수*10을 더한 알파벳이 가장 큰 알파벳이 가장 큰 수를 가진다.
  */
 
 public class Main {
@@ -26,11 +22,12 @@ public class Main {
 		Alpha alpha[] = new Alpha[26];
 		int N = Integer.valueOf(br.readLine());
 		String input[] = new String[N];
+
 		for (int i = 0; i < alpha.length; i++) {
 			alpha[i] = new Alpha((char) ('A' + i));
 		}
 
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < N; i++) { // 알파벳이 등장하는 인덱스를 추가하는 메소드
 			input[i] = br.readLine();
 			for (int idx = 0; idx < input[i].length(); idx++) {
 				char word = input[i].charAt(idx);
@@ -38,28 +35,25 @@ public class Main {
 			}
 		}
 
-		Arrays.sort(alpha);
-		HashMap<Character, Integer> map = new HashMap<>();
+		Arrays.sort(alpha); // 내림차순으로 정렬
+		HashMap<Character, Integer> map = new HashMap<>(); // 알파벳으로 숫자를 찾는 메소드
 
-		int value = 9;
+		int value = 9; // 숫자 최대값
 
 		for (int i = 0; i < alpha.length; i++) {
-			if (alpha[i].location.size() == 0) {
+			if (alpha[i].location.size() == 0) { // 알파벳이 등장하지 않았으면 더이상 찾을 가치가 없으므로 반목문 탈출
 				break;
 			}
-			map.put(alpha[i].alpha, value);
+			map.put(alpha[i].alpha, value); // 가장 큰 알파벳에 가장 큰 숫자를 대입
 			value--;
 		}
-
-//		System.out.println(Arrays.toString(alpha));
-//		System.out.println(map);
 
 		int sum = 0;
 
 		for (int i = 0; i < N; i++) {
 			int ex = 0;
 			for (int j = input[i].length() - 1; j >= 0; j--) {
-				sum = (int) (sum + map.get(input[i].charAt(j)) * Math.pow(10, ex));
+				sum = (int) (sum + map.get(input[i].charAt(j)) * Math.pow(10, ex)); // 각 알파벳에 10의 자리수를 따져서 총합 계산
 				ex++;
 			}
 		}
@@ -70,7 +64,7 @@ public class Main {
 
 }
 
-class Alpha implements Comparable<Alpha> {
+class Alpha implements Comparable<Alpha> { // 알파벳과 알파벳이 등장한 인덱스를 저장하는 객체
 	char alpha;
 	ArrayList<Integer> location;
 
@@ -80,7 +74,7 @@ class Alpha implements Comparable<Alpha> {
 	}
 
 	@Override
-	public int compareTo(Alpha o) {
+	public int compareTo(Alpha o) { // 각 알파벳이 등장한 인덱스를 지수로 10을 제곱하여 더한 것 중 큰것을 찾는 메소드
 		int thisSum = 0;
 		int oSum = 0;
 
@@ -92,10 +86,5 @@ class Alpha implements Comparable<Alpha> {
 		}
 
 		return oSum - thisSum;
-	}
-
-	@Override
-	public String toString() {
-		return "Alpha [alpha=" + alpha + ", location=" + location + "]";
 	}
 }
