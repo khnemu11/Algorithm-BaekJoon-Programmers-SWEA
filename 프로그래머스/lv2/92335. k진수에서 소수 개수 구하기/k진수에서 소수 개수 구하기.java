@@ -1,4 +1,8 @@
 import java.util.*;
+
+/*
+    소수 판별 : 해당 숫자의 제곱근 이하만큼 나누기
+*/
 class Solution {
     public int solution(int n, int k) {
 		String str = Integer.toString(n, k);
