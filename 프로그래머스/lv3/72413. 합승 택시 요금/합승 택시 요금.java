@@ -1,8 +1,11 @@
 import java.util.*;
+/*
+    풀이 알고리즘
+    중간까지 겹치고 각각 a와 b로 갈때의 최소값
+    -> 플로이드 워셜을 이용해서 구하기
+*/
 class Solution {
     public int solution(int n, int s, int a, int b, int[][] fares) {
-        int answer = 0;
-        
         int graph [][] = new int[n+1][n+1];
         int INF = 300_000_000;
         for(int i=0;i<=n;i++){
@@ -38,22 +41,10 @@ class Solution {
                 continue;
             }
             totalCost +=costA+costB;
-            // System.out.println("mid : "+mid +" cost : "+totalCost);
             min = Math.min(min,totalCost);
         }
-        // printArr(graph);
         
         return min;
-    }
-    
-    public void printArr(int arr[][]){
-        for(int i=1;i<arr.length;i++){
-            for(int j=1;j<arr[0].length;j++){
-                System.out.print(arr[i][j]+" ");
-            }  
-            System.out.println();
-        }
-         System.out.println();
     }
 }
 
