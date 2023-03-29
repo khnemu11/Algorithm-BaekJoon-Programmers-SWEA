@@ -1,3 +1,5 @@
+package bj;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.util.StringTokenizer;
  * 최대 K번까지 체스 말처럼 움직임
  * K번이 지나면 4방향만 가능 
  * 말 움직임으로 움직였을 때 방문처리와 일반 4방향 이동 방향 이동 처리 필요
+ * 말 움직임으로 움직였을 때 말움직임의 횟수 만큼 따로 방문처리 필요
  * dp로 가장 먼저 도착한 것을 우선으로 하여 방문처리
  * */
 
@@ -70,7 +73,6 @@ public class Main {
 				}
 				if (time[next.horseMoveCnt][next.row][next.col] > next.cnt) {
 					time[next.horseMoveCnt][next.row][next.col] = next.cnt;
-//					System.out.println(curr + "->" + next);
 					pq.add(next);
 				}
 			}
@@ -86,7 +88,6 @@ public class Main {
 					}
 					if (time[next.horseMoveCnt][next.row][next.col] > next.cnt) {
 						time[next.horseMoveCnt][next.row][next.col] = next.cnt;
-//						System.out.println(curr + "->" + next);
 						pq.add(next);
 					}
 				}
