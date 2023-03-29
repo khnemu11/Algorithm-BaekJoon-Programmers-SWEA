@@ -3,126 +3,99 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+/* 
+ * 	풀이 알고리즘
+ * 	
+ *	다음 위치로 넘어갈때 마다 개수 증가
+ * */
+
 public class Main {
-	static int board[][];
-	static boolean visited[][][];
-	static ArrayList<ArrayList<Pipe>> moveStragy = new ArrayList<>();
-	static int count[][][];
+	static Map<Integer, Boolean[]> moveMap = new HashMap<>();
+	static int map[][];
+	static int cnt = 0;
+	static int upDown[] = { 0, 1, 1 };
+	static int leftRight[] = { 1, 0, 1 };
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		int WIDTH_MOVE = 0;
+		int HEIGHT_MOVE = 1;
+		int DIAG_MOVE = 2;
 
-		int width = 0;
-		int height = 1;
-		int diag = 2;
+		Boolean width[] = { true, false, true };
+		Boolean height[] = { false, true, true };
+		Boolean diag_move[] = { true, true, true };
 
-		for (int i = 0; i < 3; i++) {
-			moveStragy.add(new ArrayList<Pipe>());
-		}
+		moveMap.put(WIDTH_MOVE, width);
+		moveMap.put(HEIGHT_MOVE, height);
+		moveMap.put(DIAG_MOVE, diag_move);
 
-		moveStragy.get(width).add(new Pipe(0, 1, width));
-		moveStragy.get(width).add(new Pipe(1, 1, diag));
-		moveStragy.get(height).add(new Pipe(1, 0, height));
-		moveStragy.get(height).add(new Pipe(1, 1, diag));
-		moveStragy.get(diag).add(new Pipe(0, 1, width));
-		moveStragy.get(diag).add(new Pipe(1, 0, height));
-		moveStragy.get(diag).add(new Pipe(1, 1, diag));
-
-		int size = Integer.valueOf(br.readLine());
-
-		board = new int[size][size];
-		count = new int[3][size][size];
-		visited = new boolean[3][size][size];
-		for (int i = 0; i < board.length; i++) {
+		int N = Integer.valueOf(br.readLine());
+		map = new int[N][N];
+		for (int i = 0; i < N; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < board[0].length; j++) {
-				board[i][j] = Integer.valueOf(st.nextToken());
+			for (int j = 0; j < N; j++) {
+				map[i][j] = Integer.valueOf(st.nextToken());
 			}
 		}
 
-		Pipe start = new Pipe(0, 1, width);
-		count[width][start.row][start.col] = 1;
+		move(new Pipe(WIDTH_MOVE, 0, 1));
 
-		dfs(start);
-		int sum = 0;
-		for (int i = 0; i < count.length; i++) {
-			sum += count[i][size - 1][size - 1];
-		}
-		bw.write(String.valueOf(sum));
-		bw.newLine();
+		bw.write(cnt + "\n");
 		bw.flush();
-		br.close();
-		bw.close();
 	}
 
-	static public void dfs(Pipe curr) {
-		int size = board.length;
-		for (int i = 0; i < moveStragy.get(curr.status).size(); i++) {
-			Pipe nextStragy = moveStragy.get(curr.status).get(i);
-			Pipe next = new Pipe(curr.row + nextStragy.row, curr.col + nextStragy.col, nextStragy.status);
-			if (!isValid(next, size)) {
+	public static void move(Pipe pipe) {
+//		System.out.println(pipe);
+		if (pipe.row == map.length - 1 && pipe.col == map[0].length - 1) {
+			cnt++;
+//			System.out.println("증가 : " + cnt);
+			return;
+		}
+
+		Boolean moveStragey[] = moveMap.get(pipe.direction);
+		int wallCnt = 0;
+		for (int k = 0; k < upDown.length; k++) {
+			Pipe next = new Pipe(k, pipe.row + upDown[k], pipe.col + leftRight[k]);
+
+			if (next.row < 0 || next.col < 0 || next.row >= map.length || next.col >= map[0].length) {
 				continue;
 			}
-			if (next.status == 2) {
-				if (!isValid(new Coordinate(next.row - 1, next.col), size)
-						|| !isValid(new Coordinate(next.row, next.col - 1), size)) {
-					continue;
-				}
+			if (map[next.row][next.col] == 1) {
+				wallCnt++;
+				continue;
 			}
-			count[next.status][next.row][next.col]++;
-			dfs(next);
-		}
-	}
+			if (!moveStragey[k]) {
+				continue;
+			}
+			if (k == 2 && wallCnt > 0) {
+				continue;
+			}
 
-	static public boolean isValid(Coordinate curr, int size) {
-		if (curr.row < 0 || curr.col < 0 || curr.col >= size || curr.row >= size) {
-			return false;
-		}
-		if (board[curr.row][curr.col] != 0) {
-			return false;
-		} else {
-			return true;
+//			System.out.println(pipe + " -> " + next);
+			move(next);
 		}
 	}
 }
 
-class Coordinate {
+class Pipe {
+	int direction;
 	int row;
 	int col;
 
-	public Coordinate() {
-	}
-
-	public Coordinate(int row, int col) {
+	public Pipe(int direction, int row, int col) {
+		this.direction = direction;
 		this.row = row;
 		this.col = col;
 	}
 
 	@Override
 	public String toString() {
-		return "Coordinate [row=" + row + ", col=" + col + "]";
+		return "Pipe [direction=" + direction + ", row=" + row + ", col=" + col + "]";
 	}
-
-}
-
-class Pipe extends Coordinate {
-	int status;
-
-	public Pipe(int row, int col, int status) {
-		this.row = row;
-		this.col = col;
-		this.status = status;
-	}
-
-	@Override
-	public String toString() {
-		return "Pipe [status=" + status + ", row=" + row + ", col=" + col + "]";
-	}
-
 }
