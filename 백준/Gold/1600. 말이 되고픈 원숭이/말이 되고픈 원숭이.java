@@ -1,5 +1,3 @@
-package bj;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -17,6 +15,7 @@ import java.util.StringTokenizer;
  * 말 움직임으로 움직였을 때 방문처리와 일반 4방향 이동 방향 이동 처리 필요
  * 말 움직임으로 움직였을 때 말움직임의 횟수 만큼 따로 방문처리 필요
  * dp로 가장 먼저 도착한 것을 우선으로 하여 방문처리
+   가장 움직임이 적은 것이 정답과 가까우므로 우선순위큐로 
  * */
 
 public class Main {
