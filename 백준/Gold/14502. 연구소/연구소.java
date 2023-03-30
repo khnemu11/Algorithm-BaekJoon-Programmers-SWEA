@@ -4,117 +4,111 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
+
+/*
+ * 
+ * 풀이 알고리즘
+    1) 안전 영역 = 초기 안전영역개수 - 퍼진 바이러수 개수 - 새롭게 새운 벽 개수(3)
+    2) 초기 안전영역 개수 구하기
+	3) 바이러스 3개 위치를 dfs를 이용해 고르기
+	4) 바이러스를 bfs를 이용해 퍼뜨리기(4방향 벡터 이용)
+	5) 바이러스가 퍼진 횟수를 구하기
+    6) 안전영역 개수를 구하고 최대값 저장
+*/
 
 public class Main {
-	static ArrayList<Coordinate> empty = new ArrayList<>();
-	static ArrayList<Coordinate> candidate = new ArrayList<>();
-	static ArrayList<Coordinate> virus = new ArrayList<>();
 	static int map[][];
-	static int temp[][];
 	static boolean visited[][];
+	static ArrayList<Coordinate> virusInit = new ArrayList<>();
+	static int WALL_NUM = 3;
 	static int max = 0;
+	static int safeZoneCntInit = 0;
+	static int upDown[] = { -1, 1, 0, 0 };
+	static int leftRight[] = { 0, 0, -1, 1 };
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		int row[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
-
-		map = new int[row[0]][row[1]];
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		int height = Integer.valueOf(st.nextToken());
+		int width = Integer.valueOf(st.nextToken());
+		Coordinate start = null;
+		map = new int[height][width];
 
 		for (int i = 0; i < map.length; i++) {
-			row = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+			st = new StringTokenizer(br.readLine());
 			for (int j = 0; j < map[0].length; j++) {
-				map[i][j] = row[j];
-
-				if (row[j] == 0) {
-					empty.add(new Coordinate(i, j));
-				} else if (row[j] == 2) {
-					virus.add(new Coordinate(i, j));
+				map[i][j] = Integer.valueOf(st.nextToken());
+				if (map[i][j] == 0) {
+					safeZoneCntInit++;
+					if (start == null) {
+						start = new Coordinate(i, j);
+					}
+				} else if (map[i][j] == 2) {
+					virusInit.add(new Coordinate(i, j));
 				}
 			}
 		}
+		pick(0, start, new ArrayList<Coordinate>());
 
-		makeWall(0, 3, 0);
-		bw.write(String.valueOf(max));
-		bw.newLine();
+		bw.write("" + max);
 		bw.flush();
 	}
 
-	public static void printArray(int map[][]) {
-		for (int i = 0; i < map.length; i++) {
-			for (int j = 0; j < map[0].length; j++) {
-				System.out.print(map[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
-
-	public static void makeWall(int curr, int depth, int start) {
-		if (curr == depth) {
+	public static void pick(int n, Coordinate start, ArrayList<Coordinate> walls) {
+		if (n == WALL_NUM) {
 			visited = new boolean[map.length][map[0].length];
-			temp = new int[map.length][map[0].length];
-			for (int i = 0; i < temp.length; i++) {
-				for (int j = 0; j < temp[0].length; j++) {
-					temp[i][j] = map[i][j];
-				}
-			}
+			int virusZoneCnt = spread();
+			int safeZoneCnt = safeZoneCntInit - WALL_NUM - virusZoneCnt;
 
-			for (Coordinate wall : candidate) {
-				temp[wall.row][wall.col] = 1;
-			}
+			max = Math.max(max, safeZoneCnt);
 
-			for (Coordinate virusStart : virus) {
-				if (visited[virusStart.row][virusStart.col]) {
-					continue;
-				}
-				spread(virusStart);
-			}
+		} else {
+			for (int row = start.row; row < map.length; row++) {
+				for (int col = row == start.row ? start.col : 0; col < map[0].length; col++) {
+					if (map[row][col] == 0) {
+						map[row][col] = 1;
+						walls.add(new Coordinate(row, col));
 
-			int count = 0;
-			for (int i = 0; i < temp.length; i++) {
-				for (int j = 0; j < temp[0].length; j++) {
-					if (temp[i][j] == 0) {
-						count++;
+						pick(n + 1, new Coordinate(row, col), walls);
+
+						walls.remove(walls.size() - 1);
+						map[row][col] = 0;
 					}
 				}
 			}
-//
-//			printArray(temp);
-//			System.out.println("count : " + count);
-//			System.out.println();
-			max = Math.max(max, count);
-		}
-
-		else {
-			for (int i = start; i < empty.size(); i++) {
-				candidate.add(empty.get(i));
-				makeWall(curr + 1, depth, i + 1);
-				candidate.remove(candidate.size() - 1);
-			}
 		}
 	}
 
-	public static void spread(Coordinate curr) {
-		visited[curr.row][curr.col] = true;
-		int rowMove[] = { -1, 1, 0, 0 };
-		int colMove[] = { 0, 0, -1, 1 };
+	public static int spread() {
+		Queue<Coordinate> virusQ = new LinkedList<>();
 
-		for (int k = 0; k < rowMove.length; k++) {
-			int nextRow = rowMove[k] + curr.row;
-			int nextCol = colMove[k] + curr.col;
+		int cnt = 0;
+		for (Coordinate virus : virusInit) {
+			virusQ.add(virus);
+		}
+		while (!virusQ.isEmpty()) {
+			Coordinate curr = virusQ.poll();
+			visited[curr.row][curr.col] = true;
 
-			if (nextRow < 0 || nextCol < 0 || nextRow >= temp.length || nextCol >= temp[0].length
-					|| visited[nextRow][nextCol]) {
-				continue;
-			}
-			if (temp[nextRow][nextCol] == 0) {
-				temp[nextRow][nextCol] = 2;
-				visited[nextRow][nextCol] = true;
-				spread(new Coordinate(nextRow, nextCol));
+			for (int k = 0; k < upDown.length; k++) {
+				Coordinate next = new Coordinate(curr.row + upDown[k], curr.col + leftRight[k]);
+
+				if (next.row < 0 || next.row >= map.length || next.col < 0 || next.col >= map[0].length
+						|| visited[next.row][next.col] || map[next.row][next.col] != 0) {
+					continue;
+				}
+				visited[next.row][next.col] = true;
+				virusQ.add(next);
+				cnt++;
 			}
 		}
+
+		return cnt;
 	}
 }
 
@@ -129,6 +123,7 @@ class Coordinate {
 
 	@Override
 	public String toString() {
-		return "[ row : " + row + " , col : " + col + " ]";
+		return "Coordinate [row=" + row + ", col=" + col + "]";
 	}
+
 }
