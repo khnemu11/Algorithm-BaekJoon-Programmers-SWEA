@@ -6,129 +6,89 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/* 
+ *  풀이 알고리즘
+ *  백트래킹을 이용
+ * */
+
 public class Main {
-	static int board[][];
-	static ArrayList<Coordinate> problemList = new ArrayList<>();
+	static int map[][];
+	static ArrayList<Coordinate> emptyList = new ArrayList<>();
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		board = new int[9][9];
+		map = new int[9][9];
 
-		for (int i = 0; i < 9; i++) {
-			int row[] = Arrays.stream(br.readLine().split("")).mapToInt(x -> Integer.valueOf(x)).toArray();
-			for (int j = 0; j < 9; j++) {
-				board[i][j] = Integer.valueOf(row[j]);
-				if (board[i][j] == 0) {
-					problemList.add(new Coordinate(i, j));
+		for (int i = 0; i <9; i++) {
+			int nums[] = Arrays.stream(br.readLine().split("")).mapToInt(x -> Integer.valueOf(x)).toArray();
+			for (int j = 0; j < nums.length; j++) {
+				map[i][j] = Integer.valueOf(nums[j]);
+				if (map[i][j] == 0) {
+					emptyList.add(new Coordinate(i, j));
 				}
 			}
 		}
-		solveSudoku(0);
+
+		select(0);
 
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 9; j++) {
-				sb.append(board[i][j]);
+		for (int i = 0; i < map.length; i++) {
+			for (int j = 0; j < map[0].length; j++) {
+				sb.append(map[i][j]);
 			}
 			sb.append("\n");
 		}
-		bw.write(sb.deleteCharAt(sb.length() - 1).toString());
-		bw.newLine();
+		bw.write(sb.toString());
 		bw.flush();
 	}
 
-	public static boolean solveSudoku(int currIndex) {
-		if (currIndex == problemList.size()) {
+	public static boolean select(int idx) {
+		if (idx == emptyList.size()) {
 			return true;
 		}
-		Coordinate curr = problemList.get(currIndex);
-//		for (int i = currIndex; i >= 0; i--) {
-//			System.out.print(">");
-//		}
-		boolean isFind = false;
-		for (int i = 1; i < 10; i++) {
-			curr.value = i;
-			board[curr.row][curr.col] = i;
-//			System.out.println("Curr : " + curr.toString());
-			if (!isValid(curr)) {
-				board[curr.row][curr.col] = 0;
+
+		Coordinate curr = emptyList.get(idx);
+
+		for (int i = 1; i <= 9; i++) {
+			if (!isValid(curr, i)) {
 				continue;
 			}
-
-			if (solveSudoku(currIndex + 1)) {
-				isFind = true;
-				break;
-			} else {
-				board[curr.row][curr.col] = 0;
+			map[curr.row][curr.col] = i;
+			if (select(idx + 1)) {
+				return true;
 			}
+			map[curr.row][curr.col] = 0;
 		}
-//		System.out.println("no answer in " + curr.toString());
-		return isFind;
+
+		return false;
 	}
 
-	public static void printArr(int[][] arr) {
-		for (int i = 0; i < arr.length; i++) {
-			for (int j = 0; j < arr[0].length; j++) {
-				System.out.print(arr[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
-
-	public static boolean isValid(Coordinate curr) {
-		int upDown[] = { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
-		int leftRight[] = { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
-//		System.out.println(curr.toString());
-//		printArr(board);
-		// 세로
-		boolean visited[] = new boolean[10];
-		for (int i = 0; i < board.length; i++) {
-			if (board[i][curr.col] == 0) {
-				continue;
-			}
-
-			if (visited[board[i][curr.col]]) {
-//				System.out.println("col invalid");
+	public static boolean isValid(Coordinate coord, int val) {
+		for (int i = 0; i < 9; i++) {
+			if (map[i][coord.col] == val) {
 				return false;
 			}
-			visited[board[i][curr.col]] = true;
-
 		}
-//		System.out.println("col pass");
-		// 가로
-		visited = new boolean[10];
-		for (int i = 0; i < board[0].length; i++) {
-			if (board[curr.row][i] == 0) {
-				continue;
-			}
-			if (visited[board[curr.row][i]]) {
-//				System.out.println("row invalid");
+		for (int i = 0; i < 9; i++) {
+			if (map[coord.row][i] == val) {
 				return false;
 			}
-			visited[board[curr.row][i]] = true;
 		}
 
-//		System.out.println("row pass");
-		// 9X9방향
+		Coordinate center = new Coordinate((coord.row / 3) * 3 + 1, (coord.col / 3) * 3 + 1);
 
-		Coordinate center = new Coordinate((curr.row / 3) * 3 + 1, (curr.col / 3) * 3 + 1);
-		visited = new boolean[10];
-		for (int i = 0; i < upDown.length; i++) {
-			Coordinate next = new Coordinate(center.row + upDown[i], center.col + leftRight[i]);
-			next.value = board[next.row][next.col];
-			if (next.value == 0) {
-				continue;
-			}
-			if (visited[next.value]) {
-//				System.out.println("3x3 invalid");
+		int dx[] = { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
+		int dy[] = { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
+
+		for (int k = 0; k < dx.length; k++) {
+			Coordinate next = new Coordinate(center.row + dx[k], center.col + dy[k]);
+
+			if (map[next.row][next.col] == val) {
 				return false;
 			}
-			visited[next.value] = true;
 		}
-
-//		System.out.println("3*3 pass");
 
 		return true;
 	}
@@ -137,25 +97,9 @@ public class Main {
 class Coordinate {
 	int row;
 	int col;
-	int value;
-
-	Coordinate() {
-	}
 
 	public Coordinate(int row, int col) {
 		this.row = row;
 		this.col = col;
 	}
-
-	public Coordinate(int row, int col, int value) {
-		this.row = row;
-		this.col = col;
-		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return "Coordinate [row=" + row + ", col=" + col + ", value=" + value + "]";
-	}
-
 }
