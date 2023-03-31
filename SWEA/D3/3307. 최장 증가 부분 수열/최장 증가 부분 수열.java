@@ -1,37 +1,53 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
 
-import java.util.Scanner;
-import java.util.Stack;
-
+/* 
+	풀이 과정
+*/
 public class Solution {
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		int T = sc.nextInt();
+		int T = Integer.valueOf(br.readLine());
 
 		for (int test_case = 1; test_case <= T; test_case++) {
-			int length = sc.nextInt();
-			int max = 0;
-			Stack<Integer> stack = new Stack<>();
-			for (int i = 1; i <= length; i++) {
-				int num = sc.nextInt();
-				Stack<Integer> rest = new Stack<>();
-				while (!stack.empty() && stack.peek() >= num) {
-					rest.add(stack.pop());
+			int size = Integer.valueOf(br.readLine());
+			int result[] = new int[size];
+			int nums[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+			int length = 1;
+			result[0] = nums[0];
+
+			for (int i = 1; i < nums.length; i++) {
+				int num = nums[i];
+				if (result[length - 1] < num) {
+					result[length] = num;
+					length++;
+				} else {
+					int l = 0;
+					int r = length - 1;
+					int target = 0;
+					int mid = (l + r) / 2;
+					while (l <= r) {
+						mid = (l + r) / 2;
+
+						if (result[mid] < num) {
+							target = mid + 1;
+							l = mid + 1;
+						} else {
+							r = mid - 1;
+						}
+					}
+					result[target] = num;
 				}
-				stack.add(num);
-				if (!rest.isEmpty()) {
-					rest.pop();
-				}
-				while (!rest.isEmpty()) {
-					stack.add(rest.pop());
-				}
-				max = Math.max(max, stack.size());
 			}
 
-			StringBuilder result = new StringBuilder();
-			result.append("#").append(test_case).append(" ").append(max);
-			System.out.println(result.toString());
+			bw.write("#" + test_case + " " + length + "\n");
 		}
+		bw.flush();
 	}
-
 }
