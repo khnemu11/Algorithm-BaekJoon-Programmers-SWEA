@@ -44,7 +44,7 @@ public class Main {
 				if (map[i][j] == '0') {
 					start = new People(i, j, 0, 0);
 				}
-				if (map[i][j] >= 'A' && map[i][j] <= 'F') {
+				if (map[i][j] >= 'A' && map[i][j] <= 'F') {	//문에 해당되는 열쇠만 먹기 위해 문이 존재하는지 확인하기 위한 배열 생성 
 					exist[map[i][j] - 'A'] = true;
 				}
 			}
@@ -87,7 +87,7 @@ public class Main {
 					}
 				} else if (map[next.row][next.col] >= 'a' && map[next.row][next.col] <= 'f') {
 					// 열쇠인 경우
-					if (exist[Character.toUpperCase(map[next.row][next.col]) - 'A']) {
+					if (exist[Character.toUpperCase(map[next.row][next.col]) - 'A']) {	//열쇠와 매칭되는 문이 있는경우
 						next.keyCode = next.keyCode | (1 << (map[next.row][next.col] - 'a')); // 열쇠를 or 연산으로 먹기
 					}
 					visited[next.keyCode][next.row][next.col] = curr.time;
