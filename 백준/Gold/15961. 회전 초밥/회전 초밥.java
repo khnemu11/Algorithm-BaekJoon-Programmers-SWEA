@@ -3,9 +3,19 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+/*
+ * 풀이 알고리즘
+ * 
+ * 회전초밥의 모양 => 사이클이 있는 링크드 리스트
+ * 사이클이 있는 링크드 리스트를 배열화 시키면 중복처리 가능
+ * 
+ * 이때 먹은 연속된 초밥의 종류에 따라 안먹은 종류가 있다면 1개 초밥을 더 먹을 수 있음
+ * 이때 이미 먹은 것이 아니라면 개수 추가
+ * 
+ * */
 
 public class Main {
 	public static void main(String[] args) throws NumberFormatException, IOException {
@@ -20,7 +30,6 @@ public class Main {
 
 		HashMap<Integer, Integer> map = new HashMap<>();
 
-		int sushies[] = new int[d + 1];
 		int rails[] = new int[N + k];
 
 		for (int i = 0; i < N; i++) {
@@ -31,9 +40,7 @@ public class Main {
 		}
 
 		int maxEatCnt = 0;
-//		System.out.println(Arrays.toString(rails));
 		for (int start = 0; start + k < rails.length; start++) {
-//			System.out.println("#" + start);
 			if (start == 0) {
 				for (int i = 0; i < k; i++) { // 1번째~K번째 초밥 먹기
 					map.put(rails[i], map.getOrDefault(rails[i], 0) + 1);
@@ -49,7 +56,6 @@ public class Main {
 				map.put(rails[start + k - 1], map.getOrDefault(rails[start + k - 1], 0) + 1); // 이전
 				
 			}
-//			System.out.println(map);
 			if (map.get(c) == null) {
 				maxEatCnt = Math.max(map.size() + 1, maxEatCnt);
 			} else {
