@@ -14,6 +14,10 @@ import java.util.StringTokenizer;
  *		행, 열, 3x3 위치 파악
  *	2) 같은 도미노가 있는지 확인
  *		작은수+큰수 조합의 해쉬 set을 이용해 해결 
+ *		->해시 처리가 잘 안됐음
+ *
+ *		두 수로 2자리수를 만들어 방문 처리
+ *
  * 
  * */
 
@@ -94,7 +98,7 @@ public class Main {
 		bw.flush();
 	}
 
-	public static void printArr() {
+	public static void printArr() {	//결과 출력하는 메소드
 		for (int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map[0].length; j++) {
 				System.out.print(map[i][j]);
@@ -103,64 +107,41 @@ public class Main {
 		}
 	}
 
-	public static void printArr(boolean map[][]) {
-		for (int i = 0; i < map.length; i++) {
-			for (int j = 0; j < map[0].length; j++) {
-				System.out.print(map[i][j] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
-	public static boolean domino(int idx) {
+	public static boolean domino(int idx) {	//사용한 도미노를 파악하는 메소드
 		if (idx == emptyList.size()) {
-//			System.out.println("전부 탐색 했는지 확인");
-//			for (int i = 0; i < map.length; i++) {
-//				for (int j = 0; j < map[0].length; j++) {
-//					if (!dominoVisited[i][j]) {
-//						return false;
-//					}
-//				}
-//			}
 			return true;
 		}
 
 		Coordinate coord = emptyList.get(idx);
 
-//		System.out.println("curr : " + coord);
-		if (coordVisited[coord.row][coord.col]) {
-//			System.out.println(coord + "는 방문");
+		if (coordVisited[coord.row][coord.col]) {	// 이미 방문한 좌표라면
 			return domino(idx + 1);
 		}
 
 		for (int k = 0; k < upDown.length; k++) {
 			Coordinate next = new Coordinate(coord.row + upDown[k], coord.col + leftRight[k]);
-
+			
+			//배열 밖으로 벗어난 경우
 			if (next.row < 0 || next.col < 0 || next.row >= map.length || next.col >= map[0].length) {
-//				System.out.println("배열 나감");
 				continue;
 			}
 
-//			System.out.println(coord + " with " + next);
+			//이미 사용한 좌표인 경우
 			if (coordVisited[next.row][next.col]) {
-//				System.out.println("이미 사용함");
 				continue;
 			}
-
-			Domino domino = new Domino(Math.min(map[next.row][next.col], map[coord.row][coord.col]),
-					Math.max(map[next.row][next.col], map[coord.row][coord.col]));
-
+			
+			//이미 사용한 도미노인 경우(2자리수로 표현)
 			if (dominoVisited[map[next.row][next.col] * 10 + map[coord.row][coord.col]]) {
-//				System.out.println("도미노 중복");
 				continue;
 			}
-//			System.out.println(coord + " with " + next + " 성공");
+			
 			coordVisited[coord.row][coord.col] = true;
 			coordVisited[next.row][next.col] = true;
 			dominoVisited[map[next.row][next.col] * 10 + map[coord.row][coord.col]] = true;
 			dominoVisited[map[next.row][next.col] + map[coord.row][coord.col] * 10] = true;
-
+			
+			//다음 도미노가 가능하면 현재도 가능함
 			if (domino(idx + 1)) {
 				return true;
 			}
@@ -170,14 +151,13 @@ public class Main {
 			dominoVisited[map[next.row][next.col] * 10 + map[coord.row][coord.col]] = false;
 			dominoVisited[map[next.row][next.col] + map[coord.row][coord.col] * 10] = false;
 		}
-//		System.out.println(coord + " 불가 ");
+		//상하좌우로 도미노를 사용하지 못하는 경우
 		return false;
 	}
-
+	
+	//스도쿠를 성립하는지 파악하는 메소드
 	public static boolean sudoku(int idx) {
 		if (idx == emptyList.size()) {
-//			System.out.println("스도쿠 끝 ");
-//			printArr();
 			return domino(0);
 		}
 
@@ -199,25 +179,32 @@ public class Main {
 
 		return false;
 	}
-
+	
+	//해당 숫자가 스도쿠 규칙에 맞게 빈칸에 들어갈 수 있는지 파악하는 메소드
 	public static boolean check(Coordinate coord, int val) {
+		//행 체크
 		for (int i = 0; i < map.length; i++) {
 			if (map[i][coord.col] == val) {
 				return false;
 			}
 		}
+		
+		//열 체크
 		for (int i = 0; i < map[0].length; i++) {
 			if (map[coord.row][i] == val) {
 				return false;
 			}
 		}
-
+		
+		//중앙 좌표 구하는 부분
 		int centerRow = (coord.row / 3) * 3 + 1;
 		int centerCol = (coord.col / 3) * 3 + 1;
 
 		int upDown[] = { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
 		int leftRight[] = { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
-
+		
+		
+		//3x3 영역 체크
 		for (int i = 0; i < upDown.length; i++) {
 			if (map[centerRow + upDown[i]][centerCol + leftRight[i]] == val) {
 				return false;
@@ -226,37 +213,6 @@ public class Main {
 
 		return true;
 	}
-}
-
-class Domino {
-	int small;
-	int big;
-
-	public Domino(int small, int big) {
-		this.small = small;
-		this.big = big;
-	}
-
-	@Override
-	public int hashCode() {
-		return small + big * 10;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		Domino o = (Domino) obj;
-
-		if (this.small == o.small && this.big == o.big) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return "Domino [small=" + small + ", big=" + big + "]";
-	}
-
 }
 
 class Coordinate {
