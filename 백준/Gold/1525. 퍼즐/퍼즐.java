@@ -34,14 +34,14 @@ public class Main {
 
 			for (int j = 0; j < 3; j++) {
 				sb.append(st.nextToken());
-				// 0인 인덱스 확인
+				// 0인 인덱스 위치 확인
 				if (sb.toString().charAt(sb.length() - 1) == '0') {
 					idx = i * 3 + j;
 				}
 			}
 		}
 
-		String goal = "123456780";
+		String goal = "123456780";	//목표 맵의 모양
 
 		PriorityQueue<Board> pq = new PriorityQueue<>();
 		pq.add(new Board(sb.toString(), idx));
@@ -99,7 +99,7 @@ public class Main {
 		bw.flush();
 
 	}
-
+	//현재 0인 곳과 다음 인덱스를 교환하는 메소드
 	public static String changeStr(Board board, int nextIdx) {
 		StringBuilder sb = new StringBuilder();
 
@@ -136,10 +136,5 @@ class Board implements Comparable<Board> {
 	@Override
 	public int compareTo(Board o) {
 		return this.time - o.time;
-	}
-
-	@Override
-	public String toString() {
-		return "Board [val=" + val + ", time=" + time + ", idx=" + idx + "]";
 	}
 }
