@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 
 public class Main {
 	static String candidates[];
-	static ArrayList<HashSet<Character>> list = new ArrayList<>();
+	static ArrayList<HashSet<Character>> list = new ArrayList<>();	//자리수 별로 가장 많이 나온 단어를 저장하는 리스트
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -36,20 +36,26 @@ public class Main {
 			candidates[i] = br.readLine();
 		}
 		for (int i = 0; i < L; i++) {
-			list.add(new HashSet<>());
+			list.add(new HashSet<>());	//중복 처리를 위해 set사용
 		}
         
 		for (int col = 0; col < L; col++) {
 			int maxCnt = 1;
 			HashMap<Character, Integer> map = new HashMap<>();
-			list.get(col).add(candidates[0].charAt(col));
+			list.get(col).add(candidates[0].charAt(col)); //초기 값 설정을 위해 가장 앞의 있는 문자 선택
+			
 			for (int row = 0; row < N; row++) {
 				map.put(candidates[row].charAt(col), map.getOrDefault(candidates[row].charAt(col), 0) + 1);
+				
+				//해당 문자의 개수가 이전 문자의 최대 개수보다 많을 경우 해당 문자가 가장 많이 나온 문자이다.
+				//이전까지 저장했던 값을 모두 삭제하고 새로운 set에 저장
 				if (maxCnt < map.get(candidates[row].charAt(col))) {
 					list.get(col).clear();
 					maxCnt = map.get(candidates[row].charAt(col));
 					list.get(col).add(candidates[row].charAt(col));
-				} else if (maxCnt == map.get(candidates[row].charAt(col))) {
+				} 
+				//이전 문자의 개수 최대값과 현재 문자의 최대값이 같을 경우 해당 문자를 추가한다.
+				else if (maxCnt == map.get(candidates[row].charAt(col))) {
 					list.get(col).add(candidates[row].charAt(col));
 				}
 			}
@@ -64,8 +70,9 @@ public class Main {
 
 		bw.flush();
 	}
-
+	//단어를 자리수 별로 조합하여 생성 후 규칙에 맞는지 확인하는 메소드, 값이 존재하지 않으면 빈 문자열 리턴
 	public static String select(StringBuilder sb, int idx) {
+		//모든 단어를 선택하였으면 규칙에 맞는지(자리수와 다른 단어의 개수가 1개 이하인지) 확인
 		if (idx >= list.size()) {
 			String str = sb.toString();
 
@@ -83,7 +90,9 @@ public class Main {
 			}
 
 			return str;
-		} else {
+		} 
+		//단어 선택
+		else {
 			for (Character chr : list.get(idx)) {
 				sb.append(chr);
 				String next = select(sb, idx + 1);
