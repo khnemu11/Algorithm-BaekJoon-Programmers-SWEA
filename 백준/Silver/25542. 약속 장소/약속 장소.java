@@ -5,83 +5,96 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashSet;
 import java.util.StringTokenizer;
 
+/*
+ * 풀이 알고리즘
+ * 
+ * 1) 각 자리수 별 가장 많이 나온 캐릭터 연산
+ * 2) 캐릭터를 이용해 조합
+   3) 조합으로 나온 단어와 후보 단어를 비교할 때 2개 이상 틀리면 false, 아니면 true
+ * */
+
 public class Main {
-	public static void main(String[] args) throws IOException {
+	static String candidates[];
+	static ArrayList<HashSet<Character>> list = new ArrayList<>();
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		StringBuilder sb = new StringBuilder();
 
 		int N = Integer.valueOf(st.nextToken());
 		int L = Integer.valueOf(st.nextToken());
-		List<HashMap<Character, Integer>> map = new ArrayList<>();
-		String list[] = new String[N];
 
-		for (int i = 0; i < L; i++) {
-			map.add(new HashMap<Character, Integer>());
-		}
+		candidates = new String[N];
+		StringBuilder sb = new StringBuilder();
 
-		for (int n = 0; n < N; n++) {
-			String input = br.readLine();
-			list[n] = input;
-			for (int l = 0; l < L; l++) {
-				map.get(l).put(input.charAt(l), map.get(l).getOrDefault(input.charAt(l), 0) + 1);
-			}
-		}
-
-		boolean exist = true;
-
-		for (int i = 0; i < L; i++) {
-			Iterator<Character> it = map.get(i).keySet().iterator();
-			char candidate = it.next();
-			int max = map.get(i).get(candidate);
-
-			while (it.hasNext()) {
-				char key = it.next();
-				if (map.get(i).get(key) > max) {
-					candidate = key;
-					max = map.get(i).get(key);
-					exist = true;
-				} else if (map.get(i).get(key) == max) {
-					exist = false;
-				}
-			}
-			if (exist) {
-				sb.append(candidate);
-			} else {
-				sb = new StringBuilder("CALL FRIEND");
-				break;
-			}
-
-		}
-		String result = sb.toString();
-		exist = true;
 		for (int i = 0; i < N; i++) {
-			int count = 0;
-			for (int j = 0; j < L; j++) {
-				if(result.charAt(j)!=list[i].charAt(j)) {
-					count++;
+			candidates[i] = br.readLine();
+		}
+		for (int i = 0; i < L; i++) {
+			list.add(new HashSet<>());
+		}
+        
+		for (int col = 0; col < L; col++) {
+			int maxCnt = 1;
+			HashMap<Character, Integer> map = new HashMap<>();
+			list.get(col).add(candidates[0].charAt(col));
+			for (int row = 0; row < N; row++) {
+				map.put(candidates[row].charAt(col), map.getOrDefault(candidates[row].charAt(col), 0) + 1);
+				if (maxCnt < map.get(candidates[row].charAt(col))) {
+					list.get(col).clear();
+					maxCnt = map.get(candidates[row].charAt(col));
+					list.get(col).add(candidates[row].charAt(col));
+				} else if (maxCnt == map.get(candidates[row].charAt(col))) {
+					list.get(col).add(candidates[row].charAt(col));
 				}
-				if(count>1) {
-					exist = false;
-					break;
-				}
-			}
-			if(!exist) {
-				result ="CALL FRIEND";
-				break;
 			}
 		}
+		String result = select(new StringBuilder(), 0);
+		
+		if (!result.equals("")) {
+			bw.write(result + "\n");
+		} else {
+			bw.write("CALL FRIEND\n");
+		}
 
-		bw.write(result);
-		bw.newLine();
 		bw.flush();
-
-		br.close();
-		bw.close();
 	}
+
+	public static String select(StringBuilder sb, int idx) {
+		if (idx >= list.size()) {
+			String str = sb.toString();
+
+			for (int i = 0; i < candidates.length; i++) {
+				int differCnt = 0;
+
+				for (int j = 0; j < candidates[i].length(); j++) {
+					if (str.charAt(j) != candidates[i].charAt(j)) {
+						differCnt++;
+					}
+				}
+				if (differCnt > 1) {
+					return "";
+				}
+			}
+
+			return str;
+		} else {
+			for (Character chr : list.get(idx)) {
+				sb.append(chr);
+				String next = select(sb, idx + 1);
+				if (!next.equals("")) {
+					return next;
+				}
+
+				sb.deleteCharAt(sb.length() - 1);
+			}
+			return "";
+		}
+	}
+
 }
