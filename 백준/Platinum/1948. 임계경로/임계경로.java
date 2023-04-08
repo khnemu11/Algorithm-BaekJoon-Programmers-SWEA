@@ -1,5 +1,3 @@
-package defalut;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,11 +16,21 @@ import java.util.StringTokenizer;
  *		출발도시부터 목표도시까지의 최장거리와 최장거리가 되는 도로의 수를 출력
  *
  *  1) 문제 알고리즘
-		 출발-> 목표 그래프와 목표-> 출발 역그래프 생성
-		 출발 도시부터 목표 도시까지 최장거리 연산
-	     목표 -> 중간점 -> 출발까지의 거리가 최장거리인지 확인
+ *   	출발도시부터 목표도시까지의 최장거리 -> 다익스트라 응용
+ *      최장거리가 되는 도로의 수
+ *       if (출발~도착 < 출발~중간 + 중간~도착){       		중간 도시를 경유하는 것이 더 오래걸리는 경우
+ *       	출발~도착까지 간선의 수 = 출발~중간간선의 수 +1
+ *       }
+ *       else if (출발~도착 == 출발~중간 + 중간~도착){		중간 도시를 경유하는 것과 아닌 것의 시간이 같은 경우
+ *       	출발~도착까지 간선의 수 = 출발~중간간선의 수 +1 + 출발~도착의 간선의 수
+ *       }											중간 도시를 경유하는 것이 더 짧게걸리는 경우 최신화하지 않음
+ *       											
+ *       각 중간도시를 다시 방문하지 않아야 해당 알고리즘이 가능
+ *       -> 해당 도시로 들어오는 간선이 더이상 없다.
+ *       -> 위상정렬 이용
+ *       -> 위상정렬을 이용해 중간도시를 다시 방문하지 않는 다익스트라 알고리즘 이용
  *       
- *       걸린시간 : 2시간
+ *       걸린시간 : 52분
 */
 public class Main {
 	public static void main(String[] args) throws NumberFormatException, IOException {
@@ -30,8 +38,8 @@ public class Main {
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 		int parentsNum[];
 		int distance[]; // 인덱스 노드까지 가는 최대 거리의 간선 개수
-		ArrayList<ArrayList<Node>> graph = new ArrayList<>(); // 출발->목표까지의 그래프
-		ArrayList<ArrayList<Node>> reverse = new ArrayList<>(); // 목표->출발까지의 그래프
+		ArrayList<ArrayList<Node>> graph = new ArrayList<>();
+		ArrayList<ArrayList<Node>> reverse = new ArrayList<>();
 
 		int N = Integer.valueOf(br.readLine());
 		int M = Integer.valueOf(br.readLine());
@@ -63,7 +71,7 @@ public class Main {
 		PriorityQueue<Node> pQueue = new PriorityQueue<>();
 		pQueue.add(new Node(start, 0));
 
-		while (!pQueue.isEmpty()) { // 다익스트라를 이용해 최장거리 연산
+		while (!pQueue.isEmpty()) {
 			Node curr = pQueue.poll();
 
 			if (distance[curr.val] > curr.cost) {
@@ -79,14 +87,15 @@ public class Main {
 		}
 
 		Queue<Node> queue = new LinkedList<>();
-		queue.add(new Node(end, 0)); // 도착지부터 출발
+		queue.add(new Node(end, 0));
 
 		int edgeNum = 0;
-		while (!queue.isEmpty()) { // 도착지 -> 중간->출발까지의 거리가 최장거리인지 확인후 해당 간선 더하기
-			Node curr = queue.poll(); //현재도시 ->도착지 까지의 거리가 담긴 노드
-			
+		while (!queue.isEmpty()) {
+			Node curr = queue.poll();
+//			System.out.println(curr);
 			for (Node to : reverse.get(curr.val)) {
-				if (distance[to.val] + to.cost + curr.cost == distance[end] && !visited[curr.val][to.val]) {	//출발 -> 중간 -> 현재도시 -> 도착지까지의 거리가 최장거리이며 이미 탐색한 간선인지 확인
+//				System.out.println(to.val + " : " + (distance[to.val] + to.cost + curr.cost) + " vs " + distance[end]);
+				if (distance[to.val] + to.cost + curr.cost == distance[end] && !visited[curr.val][to.val]) {
 					visited[curr.val][to.val] = true;
 					edgeNum++;
 					queue.add(new Node(to.val, distance[end] - distance[to.val]));
@@ -110,6 +119,12 @@ class Node implements Comparable<Node> {
 		this.val = val;
 		this.cost = cost;
 	}
+
+	@Override
+	public String toString() {
+		return "Node [val=" + val + ", cost=" + cost + "]";
+	}
+
 	@Override
 	public int compareTo(Node o) {
 		return this.cost - o.cost;
