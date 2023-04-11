@@ -3,35 +3,32 @@ import java.util.*;
 class Solution {
     public int[] solution(String[] genres, int[] plays) {
         Map<String,PriorityQueue> playsByGenre = new HashMap<>();
-        Map<String,Integer> maxValByGenre = new HashMap<>();
+        Map<String,Integer> sumValByGenre = new HashMap<>();
         
         for(int i=0;i<genres.length;i++){
             Song song = new Song(genres[i],plays[i],i);
-            // System.out.println("input "+song.seq+" : "+song.play);
             PriorityQueue<Song>pq = playsByGenre.getOrDefault(genres[i],new PriorityQueue<Song>());
             pq.add(song);
             playsByGenre.put(genres[i],pq);
-            maxValByGenre.put(genres[i],maxValByGenre.getOrDefault(genres[i],0)+plays[i]) ;
+            sumValByGenre.put(genres[i],sumValByGenre.getOrDefault(genres[i],0)+plays[i]) ;
         }
         
         PriorityQueue<Genre> genreQ = new PriorityQueue<>(Collections.reverseOrder());
         
-        for(String key: maxValByGenre.keySet()){
-            genreQ.add(new Genre(key,maxValByGenre.get(key)));
+        for(String key: sumValByGenre.keySet()){
+            genreQ.add(new Genre(key,sumValByGenre.get(key)));
         }
         
         ArrayList<Integer> list=new ArrayList<>();
 
         while(!genreQ.isEmpty()){
             Genre genre = genreQ.poll();
-            // System.out.println(genre.name);
             PriorityQueue<Song> songQ = playsByGenre.get(genre.name);
             
             int cnt=0;
             
             while(!songQ.isEmpty() && cnt<2){
                 Song song = songQ.poll();
-                // System.out.println(song.seq+" : "+song.play);
                 list.add(song.seq);
                 cnt++;
             }
