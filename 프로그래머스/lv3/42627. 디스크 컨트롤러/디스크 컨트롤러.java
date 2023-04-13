@@ -2,6 +2,8 @@ import java.util.*;
 
 class Solution {
     public int solution(int[][] jobs) {
+        //가장 먼저 요청한 작업부터 정렬
+        //이때 요청한 시간이 같아면 작업량이 작은것 부터
         PriorityQueue<Process> sortedJobs = new PriorityQueue<>(jobs.length, (o1,o2)->{
             if(o1.requestTime == o2.requestTime){
                 return o1.val - o2.val;
@@ -19,7 +21,7 @@ class Solution {
         PriorityQueue<Process> priorityJobs = new PriorityQueue<>(sortedJobs.size(), (o1,o2)->o1.val - o2.val);
         
         while(!sortedJobs.isEmpty()){
-            while(!sortedJobs.isEmpty() && currTime >= sortedJobs.peek().requestTime){
+            while(!sortedJobs.isEmpty() && currTime >= sortedJobs.peek().requestTime){  //현재 시간 이전에 요청한 작업을 꺼내옴
                 priorityJobs.add(sortedJobs.poll());
             }
             
@@ -32,18 +34,13 @@ class Solution {
             Process process = priorityJobs.poll();
             currTime = currTime + process.val;
             spendTimeList.add( currTime-process.requestTime);
-            System.out.println(currTime);
         }
-        
+        //남은 대기열에 있는 작업 처리
         while(!priorityJobs.isEmpty()){            
             Process process = priorityJobs.poll();
-            
-            System.out.println(process.requestTime+" : "+process.val);
             currTime = currTime + process.val;
             spendTimeList.add(currTime-process.requestTime);
-            System.out.println(currTime);
         }
-        
         
         int answer = (int)spendTimeList.stream().mapToInt(x->Integer.valueOf(x)).average().getAsDouble();
         return answer;
