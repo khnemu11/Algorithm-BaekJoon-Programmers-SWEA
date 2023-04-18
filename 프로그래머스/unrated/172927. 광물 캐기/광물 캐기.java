@@ -11,11 +11,12 @@ import java.util.*;
 class Solution {
     int min = Integer.MAX_VALUE;
     int fatique[][] = {{1,1,1},{5,1,1},{25,5,1}};   //[곡괭이][광물]의 피로도 배열
-    HashMap<String,Integer> AtrributeIndex = new HashMap<>();
+    HashMap<String,Integer> AtrributeIndex = new HashMap<>(); //재료 속성->인덱스로 변환하는 맵
     
     public int solution(int[] picks, String[] minerals) {
         int answer = 0;
         
+        //재료 속성을 인덱스로 변환
         AtrributeIndex.put("diamond",0);
         AtrributeIndex.put("iron",1);
         AtrributeIndex.put("stone",2);
