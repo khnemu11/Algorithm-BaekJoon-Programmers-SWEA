@@ -26,9 +26,9 @@ class Solution {
         
         while(!pq.isEmpty()){
             Reservation reservation = pq.poll();
-            // System.out.println(reservation);
             boolean canJoin = false;
             for(int i=0;i<rooms.size();i++){
+                //23시 50분 부터는 청소시간을 포함하면 다음날 00시 부터 예약이 가능하므로 제외
                 if(rooms.get(i).end.isAfter(LocalTime.of(23,49))){
                     continue;
                 }
@@ -42,6 +42,8 @@ class Solution {
             if(!canJoin){
                 rooms.add(reservation);
             }
+            //방들을 끝나는 시간이 늦게 끝나는 시간으로 재정렬
+            //늦게 끝나는 곳에 예약이 가능하면 일찍 끝나는곳도 가능하기 때문에 빈틈없이 예약 가능
             Collections.sort(rooms,new Comparator<Reservation>(){
                 @Override
                 public int compare(Reservation o1,Reservation o2){
@@ -52,7 +54,6 @@ class Solution {
                     }
                 }
             });
-            // System.out.println(rooms);
         }   
         return rooms.size();
     }
