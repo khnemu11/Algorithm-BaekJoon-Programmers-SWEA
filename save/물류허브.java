@@ -79,20 +79,12 @@ class UserSolution {
 		PriorityQueue<City> pq = new PriorityQueue<>();
 		pq.add(new City(cityToIdxMap.get(start), 0));
 
-		int visited = 0;	//방문한 도시의 개수
-
 		while (!pq.isEmpty()) {
-			if (visited == cityNum) {
-				break;
-			}
-
 			City curr = pq.poll();
 
 			if (distance[curr.idx] < curr.cost) {
 				continue;
 			}
-
-			visited++;
 
 			for (City end : graph[curr.idx]) {
 				if (distance[end.idx] > distance[curr.idx] + end.cost) {
