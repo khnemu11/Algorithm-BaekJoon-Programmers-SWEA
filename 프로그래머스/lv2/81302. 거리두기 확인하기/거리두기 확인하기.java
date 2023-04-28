@@ -49,6 +49,9 @@ class Solution {
             if(curr.distance > visited[curr.row][curr.col]){
                 continue;
             }
+            if(curr.distance > 2){
+                continue;
+            }
             // System.out.println(curr.row+" , "+curr.col +" distance : "+curr.distance);
             for(int k=0;k<dx.length;k++){
                 
