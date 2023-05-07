@@ -1,6 +1,8 @@
-SELECT A.TITLE, A.BOARD_ID, B.REPLY_ID, B.WRITER_ID, B.CONTENTS, DATE_FORMAT(B.CREATED_DATE, '%Y-%m-%d')
-FROM USED_GOODS_BOARD A
-JOIN USED_GOODS_REPLY B
-ON A.BOARD_ID = B.BOARD_ID
-WHERE DATE_FORMAT(A.CREATED_DATE, '%Y-%m') = '2022-10'
-ORDER BY 6, 1
+-- 코드를 입력하세요
+
+
+SELECT board.TITLE, board.BOARD_ID, reply.REPLY_ID, reply.WRITER_ID, reply.CONTENTS, date_format(reply.CREATED_DATE,'%Y-%m-%d') 
+from USED_GOODS_BOARD as board join USED_GOODS_REPLY as reply
+on board.BOARD_ID = reply.BOARD_ID
+where date_format(board.CREATED_DATE,'%Y-%m') = '2022-10'
+order by 6,1
