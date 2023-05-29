@@ -1,120 +1,75 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
-/*
-	풀이 알고리즘
-	
-	다음 움직임의 부모는 이전 움직임 -> 트리로 구현 가능
-	루트의 개수를 출력
- */
 public class Main {
-	static int parents[][];
-	static Coordinate coords[];
+	static int parents[];
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		StringTokenizer st = new StringTokenizer(br.readLine());
 
+		StringTokenizer st = new StringTokenizer(br.readLine());
 		int height = Integer.valueOf(st.nextToken());
 		int width = Integer.valueOf(st.nextToken());
+		parents = new int[width * height];
 
-		parents = new int[height][width];
-		coords = new Coordinate[height * width];
-		String map[][] = new String[height][width];
-		Queue<Coordinate> queue = new LinkedList<>();
-		int seq = 0;
-		for (int i = 0; i < height; i++) {
-			String element[] = br.readLine().split("");
-			for (int j = 0; j < width; j++) {
-				map[i][j] = element[j];
-				coords[seq] = new Coordinate(seq, i, j);
-				parents[i][j] = seq;
-				queue.add(new Coordinate(seq++, i, j));
+		for (int i = 0; i < parents.length; i++) {
+			parents[i] = i;
+		}
+
+		for (int row = 0; row < height; row++) {
+			String input = br.readLine();
+
+			for (int col = 0; col < input.length(); col++) {
+				char direction = input.charAt(col);
+				int parent = row * width + col;
+				int child = 0;
+
+				if (direction == 'D') {
+					child = (row + 1) * width + col;
+				} else if (direction == 'L') {
+					child = row * width + col - 1;
+				} else if (direction == 'R') {
+					child = row * width + col + 1;
+				} else if (direction == 'U') {
+					child = (row - 1) * width + col;
+				}
+//				System.out.println("parent : " + parent);
+//				System.out.println("child : " + child);
+
+				union(child, parent);
+//				System.out.println(Arrays.toString(parents));
 			}
 		}
 
-		HashMap<String, Integer> rowMoveMap = new HashMap<>();
-		HashMap<String, Integer> colMoveMap = new HashMap<>();
+		Set<Integer> safeZone = new HashSet<>();
 
-		rowMoveMap.put("D", 1);
-		rowMoveMap.put("U", -1);
-		rowMoveMap.put("L", 0);
-		rowMoveMap.put("R", 0);
-
-		colMoveMap.put("D", 0);
-		colMoveMap.put("U", 0);
-		colMoveMap.put("L", -1);
-		colMoveMap.put("R", 1);
-
-		while (!queue.isEmpty()) {
-			Coordinate currCoordinate = queue.poll();
-			Coordinate nextCoordinate = new Coordinate(seq,
-					currCoordinate.row + rowMoveMap.get(map[currCoordinate.row][currCoordinate.col]),
-					currCoordinate.col + colMoveMap.get(map[currCoordinate.row][currCoordinate.col]));
-
-			if (nextCoordinate.row < 0 || nextCoordinate.col < 0 || nextCoordinate.row >= map.length
-					|| nextCoordinate.col >= map[0].length) {
-				continue;
-			}
-
-			union(currCoordinate, nextCoordinate);
+		for (int i = 0; i < parents.length; i++) {
+			safeZone.add(getParent(parents[i]));
 		}
 
-		int cnt = 0;
-
-		boolean visited[] = new boolean[width * height];
-
-		for (int i = 0; i < coords.length; i++) {
-			int parent = getParent(coords[i]);
-			if (visited[parent]) {
-				continue;
-			}
-			visited[parent] = true;
-			cnt++;
-		}
-
-		bw.write(cnt + "\n");
+		bw.write(safeZone.size() + "\n");
 		bw.flush();
 	}
 
-	public static int getParent(Coordinate child) {
-		if (parents[child.row][child.col] == child.seq) {
-			return parents[child.row][child.col];
-		} else {
-			parents[child.row][child.col] = getParent(coords[parents[child.row][child.col]]);
-			return parents[child.row][child.col];
+	public static int getParent(int child) {
+		if (parents[child] == child) {
+			return parents[child];
 		}
+
+		parents[child] = getParent(parents[child]);
+		return parents[child];
 	}
 
-	public static void union(Coordinate a, Coordinate b) {
-		Coordinate pa = coords[getParent(a)];
-		Coordinate pb = coords[getParent(b)];
+	public static void union(int child, int parent) {
+		int pc = getParent(child);
+		int pp = getParent(parent);
 
-		parents[pb.row][pb.col] = pa.seq;
-	}
-}
-
-class Coordinate {
-	int seq;
-	int row;
-	int col;
-
-	public Coordinate(int seq, int row, int col) {
-		this.seq = seq;
-		this.row = row;
-		this.col = col;
-	}
-
-	@Override
-	public String toString() {
-		return "Coordinate [row=" + row + ", col=" + col + "]";
+		parents[pc] = pp;
 	}
 }
