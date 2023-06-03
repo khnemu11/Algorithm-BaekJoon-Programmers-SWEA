@@ -21,54 +21,48 @@ public class Main {
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		int N = Integer.valueOf(st.nextToken());
-		int M = Integer.valueOf(st.nextToken());
+		int N = Integer.valueOf(st.nextToken()); // 강의 최대 개수
+		int M = Integer.valueOf(st.nextToken()); // 블루레이 개수
 
 		int lectures[] = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
 
-		long max = 0;
-
+		long max = 0; // 가능한 블루레이 최대값
+		long min = 0; // 가능한 블루레이 최소값
+		
+		//블루레이 최대값과 최소값을 구하는 부분
 		for (int i = 0; i < lectures.length; i++) {
 			max += lectures[i];
+			min = Math.max(min, lectures[i]);
 		}
 
-		long result = max;
-		long min = 1;
-
+		long result = max; // 가능한 블루레이 최대값
+		
+		//이분탐색을 이용해 블루레이 최소값을 구하는 부분
 		while (min <= max) {
-			if (min == 15) {
-				break;
-			}
 			long mid = (min + max) / 2;
-
-//			System.out.println("min : " + min + " max : " + max + " mid : " + mid);
-			int cnt = 1;
-			long sum = 0;
+			int cnt = 1;	//블루레이 개수
+			long sum = 0;	//현재 블루레이 크기
 
 			for (int i = 0; i < lectures.length; i++) {
-				if(lectures[i] > mid) {
-					cnt = M+1;
-					break;
-				}
+				//현재 강의를 합치면 블루레이 크기를 넘어갔을 때 다음 블루레이로
 				if (sum + lectures[i] > mid) {
 					cnt++;
-					if(cnt>M) {
-						break;
-					}
-					sum = lectures[i];
-				} else {
-					sum += lectures[i];
+					sum = 0;
 				}
+				sum += lectures[i];
 			}
-//			System.out.println("cnt : " + cnt);
+			
+			//현재 블루레이 크기로 만들 시 지정된 개수를 오버할 때 최소값 최신화
 			if (cnt > M) {
 				min = mid + 1;
-			} else {
-				result = Math.min(mid, result);
+			} 
+			//현재 블루레이 크기로 만들 수 있을 때 최대값 최신화
+			else {
 				max = mid - 1;
 			}
 		}
-		bw.write(result+"\n");
+		//최소값 출력
+		bw.write(min + "\n");
 		bw.close();
 	}
 }
