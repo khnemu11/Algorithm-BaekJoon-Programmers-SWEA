@@ -34,8 +34,6 @@ public class Main {
 			max += lectures[i];
 			min = Math.max(min, lectures[i]);
 		}
-
-		long result = max; // 가능한 블루레이 최대값
 		
 		//이분탐색을 이용해 블루레이 최소값을 구하는 부분
 		while (min <= max) {
