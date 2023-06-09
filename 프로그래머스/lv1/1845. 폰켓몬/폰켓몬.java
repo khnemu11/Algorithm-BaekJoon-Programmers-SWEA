@@ -2,13 +2,19 @@ import java.util.*;
 
 class Solution {
     public int solution(int[] nums) {
-        Set<Integer> pocketmons = new HashSet<>();
         
-        for(int num : nums){
-            pocketmons.add(num);
+        Set<Integer> phoneketmon = new HashSet<>();
+        
+        for (int i = 0; i < nums.length; i++) {
+            
+            phoneketmon.add(nums[i]);
+            
+            if (phoneketmon.size() == nums.length / 2) {
+                break;
+            }
         }
-
-        int answer = nums.length/2 < pocketmons.size() ? nums.length/2 : pocketmons.size() ;
-        return answer;
+        
+        
+        return phoneketmon.size();
     }
 }
