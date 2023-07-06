@@ -14,15 +14,16 @@ class Solution {
         setAreaList(emptyAreas,game_board,0);
         
         puzzleVisited = new boolean[puzzleAreas.size()];
-        selectPuzzle(0,0);
+        findFitPuzzle(0,0);
         return maxCount;
     }
-    public void selectPuzzle(int idx,int count){
-        // System.out.println("Depth : "+idx);
+    //게임보드에 맞는 퍼즐을 찾는 메소드
+    public void findFitPuzzle(int idx,int count){
         if(idx >= emptyAreas.size()){
             maxCount = Math.max(maxCount,count);
             return;
         }
+        //퍼즐을 찾았는지 판별하는 변수
         boolean findPuzzle = false;
         for(int i=0;i<puzzleAreas.size();i++){
             if(puzzleVisited[i]){
@@ -30,23 +31,23 @@ class Solution {
             }else if(puzzleAreas.get(i).count !=emptyAreas.get(idx).count){
                 continue;
             }
-            // printArea(emptyAreas.get(idx).map);
-            // printArea(puzzleAreas.get(i).map);
-            // System.out.println("==========");
-            for(int j=0;j<5;j++){
+            //90도씩 4번 회전
+            for(int j=0;j<4;j++){
                 if(puzzleAreas.get(i).equals(emptyAreas.get(idx))){
                     puzzleVisited[i]=true;
                     findPuzzle=true;
-                    selectPuzzle(idx+1,puzzleAreas.get(i).count+count);
+                    findFitPuzzle(idx+1,puzzleAreas.get(i).count+count);
                     break;
                 }
                 puzzleAreas.get(i).rotate();
             }
         }
+        //찾은것이 없으면 다음으로
         if(!findPuzzle){
-            selectPuzzle(idx+1,count);
+            findFitPuzzle(idx+1,count);
         }
     }
+    //영역을 찾는 메소드(저장할 리스트, 판별할 맵, 도형 값)
     public void setAreaList(List<Area> areas,int map[][],int value){
         boolean visited[][] = new boolean[map.length][map[0].length];
         
@@ -57,7 +58,6 @@ class Solution {
                 }else if(visited[row][col]){
                     continue;
                 }
-                // System.out.println(row+" , "+col);
                 Area area = new Area();
                 findArea(new Coordinate(row,col),map,area,visited,value);
                 setArea(area,map,value);
@@ -65,7 +65,7 @@ class Solution {
             }   
         }
     }
-
+    //도형에 해당되는 모든 좌표값을 저장하는 메소드
     public void setArea(Area area,int board[][],int value){
         int map [][] = new int[area.maxRow-area.minRow+1][area.maxCol-area.minCol+1];
         int row=0;
@@ -86,15 +86,7 @@ class Solution {
         area.map = map;
         area.count = count;
     }
-    public void printArea(int[][] map){
-        for(int i=0;i<map.length;i++){
-            for(int j=0;j<map[0].length;j++){
-                System.out.print(map[i][j]+" ");
-            }   
-            System.out.println();
-        }
-        System.out.println();
-    }
+    //bfs로 도형의 가장 큰/작은 행/열 값을 구하는 메소드
     public void findArea(Coordinate start, int[][] map, Area area,boolean visited[][],int value){
         Queue<Coordinate> q = new LinkedList<>();
         q.add(start);
@@ -150,6 +142,7 @@ class Area{
         this.minCol = minCol;
         this.maxCol = maxCol;
     }
+    //90도 반시계 회전
     public void rotate(){
         int[][] temp = new int[map[0].length][map.length];
         
