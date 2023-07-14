@@ -2,6 +2,7 @@ import java.util.*;
 // 현재 최대값 = 이전 최대값 + 현재 열 => DP
 // 시간 복잡도 = 모든 행의 개수 * 각 열당 최대값 연산 * 모든 열의 개수 = 행의 개수 * 열의 개수 ^2
 //             = 100,000 * 4^4 = 6,400,000 
+// 걸린시간 : 16분
 class Solution {
     int solution(int[][] land) {
         int answer = 0;
