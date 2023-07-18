@@ -1,17 +1,25 @@
 import java.util.*;
+/*
+    크기 30 => 구현
 
+    while(떠트릴 수 있는 블록이 있다면) 
+        1) 2*2 터질 수 있는 박스 탐색
+        2) 터뜨리기
+        3) 비어있는 공간을 위에서 블록 내리기
+    
+    걸린시간 : 35분 28초
+*/
 class Solution {
-    char[][] map;
-    boolean[][] isExploded;
-    boolean hasExplode = true;
-    int count = 0;
-    char EMPTY = 'e';
+    char[][] map;  
+    boolean[][] isExploded; //터지는 영역
+    boolean hasExplode = true;  //터트릴 수 있는 블록 판단 변수 
+    int count = 0;  //터진 폭탄 개수
+    char EMPTY = 'e'; //비어있는 공간 표현
     
     public int solution(int m, int n, String[] board) {
         init(board);
-       
+            
         while(hasExplode){
-            // printArr(map);
             findExplosion();
             countExplodedBlocks();
             fallBlocks();
@@ -19,15 +27,7 @@ class Solution {
         
         return count;
     }
-    public void printArr(char map[][]){
-         for(int i=0;i<map.length;i++){
-            for(int j=0;j<map[i].length;j++){
-                System.out.print(map[i][j]+" ");
-            }    
-            System.out.println();
-        }
-        System.out.println();
-    }
+
     //필드 default값 넣기
     public void init(String[] board){
         map = new char[board.length][board[0].length()];
@@ -44,18 +44,18 @@ class Solution {
     }
     //4칸 모두 똑같으면 폭발
     public void findExplosion(){
-        // System.out.println("execute findExplosion");
         isExploded = new boolean[map.length][map[0].length];
         hasExplode=false;
         
         for(int row=0;row<map.length-1;row++){
             for(int col=0;col<map[row].length-1;col++){
-                Set<Character> blocks = new HashSet<>();
+                Set<Character> blocks = new HashSet<>();    //4영역 블록
                 blocks.add(map[row][col]);
                 blocks.add(map[row][col+1]);
                 blocks.add(map[row+1][col]);
                 blocks.add(map[row+1][col+1]);
                 
+                //모두 같은블록이고 빈 영역이 아닐때 터뜨리기 표식
                 if(blocks.size()==1 && !blocks.contains(EMPTY)){
                     hasExplode=true;
                     isExploded[row][col]=true;
@@ -68,7 +68,6 @@ class Solution {
     }
     //폭발하는 칸 세기
     public void countExplodedBlocks(){
-        // System.out.println("execute countExplodedBlocks");
         for(int row=0;row<map.length;row++){
             for(int col=0;col<map[row].length;col++){
                 if(isExploded[row][col]){
@@ -81,7 +80,6 @@ class Solution {
     
     //비어있는 블록 떨구기
     public void fallBlocks(){
-        // System.out.println("execute fallBlocks");
         for(int col=0;col<map[0].length;col++){
             for(int row=map.length-1;row>0;row--){
                 int currRow = row;
