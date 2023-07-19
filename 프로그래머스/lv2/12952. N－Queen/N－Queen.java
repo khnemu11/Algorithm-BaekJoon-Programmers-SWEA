@@ -1,5 +1,7 @@
 /*
     N-Queen => 백트래킹 => dfs
+    
+    걸린시간 : 13분 26초
 */
 class Solution {
     int count = 0; //퀸을 놓을 수 있는 개수
