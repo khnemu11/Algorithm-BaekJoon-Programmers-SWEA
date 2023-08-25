@@ -20,7 +20,7 @@ class Solution{
                         - sum[i+len][j-1] + sum[i-1][j-1];     
                     
                     if(cnt == (len+1)*(len+1)){
-                        answer = Math.max(cnt,answer);
+                        answer = cnt;
                     }
                     len++;
                 }
