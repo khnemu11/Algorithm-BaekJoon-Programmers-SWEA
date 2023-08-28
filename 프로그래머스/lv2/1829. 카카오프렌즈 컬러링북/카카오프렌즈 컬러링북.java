@@ -1,7 +1,5 @@
 import java.util.*;
-/*
-    [[1, 1, 1, 0], [1, 1, 1, 0], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]
-    
+/*    
     1110
     1110
     0001
@@ -27,13 +25,12 @@ class Solution {
                     continue;
                 }
                 numberOfArea++;
-                // System.out.println("영역 개수 : "+numberOfArea);
                 Coordinate coord = new Coordinate(row, col);
                 
                 Queue<Coordinate> q = new LinkedList<>();
                 q.add(coord);
                 int areaSize = 0;
-                // System.out.println("시작 "+coord.row+" , "+coord.col);
+                
                 while(!q.isEmpty()){
                     Coordinate curr = q.poll();
                     
@@ -51,17 +48,16 @@ class Solution {
                         if(visited[next.row][next.col]){
                             continue;
                         }
-                        // System.out.println(next.row+" , "+next.col +" val : "+picture[next.row][next.col]);
                         visited[next.row][next.col]=true;
                         q.add(next);
                     }
                 }
                 
                 maxSizeOfOneArea = Math.max(maxSizeOfOneArea,areaSize);
-                // System.out.println("maxSizeOfOneArea: "+maxSizeOfOneArea);
+
             }
         }        
-        // System.out.println(numberOfArea+" "+maxSizeOfOneArea);
+
         int[] answer = new int[2];
         answer[0] = numberOfArea;
         answer[1] = maxSizeOfOneArea;
