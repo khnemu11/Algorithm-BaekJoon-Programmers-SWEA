@@ -24,7 +24,7 @@ public class Main {
 			}
 		}
 
-		int count = 0;
+		int count = 0;	//가능한 도로 개수
 
 		//가로 확인
 		for(int row=0;row<N;row++){
@@ -32,7 +32,7 @@ public class Main {
 			Boolean canRoad = true;
 			Integer height = map[row][0];
 			for(int col=0;col<N;col++){
-				//같은경우
+				//같은 경우
 				if(height == map[row][col]){
 					continue;
 				}
@@ -44,15 +44,17 @@ public class Main {
 				//이전 높이보다 현재가 큰 경우(이전 위치를 끝으로 경사로 놓기)
 				if(height<map[row][col]){
 					for(int i=1;i<=L;i++) {
-						// System.out.println(col + " vs " + (col - i));
+						//경사로를 세울 수 없는 경우
 						if (col - i < 0) {
 							canRoad = false;
 							break;
 						}
+						//이미 경사로로 사용한 경우
 						if(visited[col-i]){
 							canRoad = false;
 							break;
 						}
+						//경사로로 지정된 높이가 이전과 다른 경우
 						if (map[row][col-1] != map[row][col - i]) {
 							canRoad = false;
 							break;
@@ -63,7 +65,6 @@ public class Main {
 				//이전 높이보다 현재가 작은 경우(현재 위치를 시작으로 경사로 놓기)
 				else if(height > map[row][col]){
 					for(int i=0;i<L;i++){
-						// System.out.println(col +" vs "+(col+i));
 						if(col + i >=N){
 							canRoad = false;
 							break;
@@ -88,8 +89,6 @@ public class Main {
 			}
 		}
 
-		// System.out.println("count : "+count);
-
 		//세로 확인
 		for(int col=0;col<N;col++){
 			boolean[] visited = new boolean[N];
@@ -108,7 +107,6 @@ public class Main {
 				//이전 높이보다 현재가 큰 경우(이전 위치를 끝으로 경사로 놓기)
 				if(height<map[row][col]){
 					for(int i=1;i<=L;i++) {
-						// System.out.println(row + " vs " + (row - i));
 						if (row - i < 0) {
 							canRoad = false;
 							break;
@@ -127,7 +125,6 @@ public class Main {
 				//이전 높이보다 현재가 작은 경우(현재 위치를 시작으로 경사로 놓기)
 				else if(height > map[row][col]){
 					for(int i=0;i<L;i++){
-						// System.out.println(row +" vs "+(row+i));
 						if(row + i >=N){
 							canRoad = false;
 							break;
