@@ -1,3 +1,5 @@
+package com.company;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ public class Main {
                 map[i][j] = input.charAt(j);
             }
         }
-        // printMap(map);
+
        int count = gameStart(map);
        System.out.println(count);
     }
@@ -32,8 +34,6 @@ public class Main {
             boolean[][] visited = new boolean[map.length][map[0].length];
             List<Puyo> explosedAllPuyoList = new ArrayList<>();
 
-            // System.out.println(q);
-
             while(!q.isEmpty()){
                 Puyo puyo = q.poll();
 
@@ -42,8 +42,7 @@ public class Main {
                 }
 
                 List<Puyo> explosedPuyoList = findExplosedPuyo(puyo,map,visited);
-                // System.out.println("시작 "+puyo);
-                // System.out.println(explosedPuyoList);
+
                 //같은 색 뿌요 개수가 4개 이상인 경우 폭발 대상 뿌요이므로 전체 폭발 뿌요 리스트에 넣는다.
                 if(explosedPuyoList.size()>=4) {
                     chainCheck = true; //폭발이 존재해 다음 체인도 확인해야함
@@ -51,16 +50,12 @@ public class Main {
                         explosedAllPuyoList.add(p);
                     }
                 }
-
-                // System.out.println(explosedAllPuyoList);
             }
             //뿌요 터뜨리기
-            // System.out.println("==== 뿌요 터뜨림 ====");
             explosePuyo(map,explosedAllPuyoList);
-            // printMap(map);
+
             //빈 공간에 뿌요 내리기
             dropPuyo(map);
-            // printMap(map);
         }
         return chain;
     }
@@ -108,29 +103,24 @@ public class Main {
 
         while(!puyoQueue.isEmpty()){
             Coordinate curr = puyoQueue.poll();
-            // System.out.println(curr+" 방문함");
             visited[curr.row][curr.col]=true;
+
             for(int i=0;i<dr.length;i++){
                 //다음 뿌요
                 Coordinate next = new Coordinate(curr.row+dr[i],curr.col+dc[i]);
-                // System.out.println(next+" 다음 뿌요");
+
                 //맵 밖을 벗어나는 경우
                 if(next.row < 0 || next.col < 0 || next.row>=map.length || next.col>=map[0].length){
-                    // System.out.println("맵 밖을 벗어남");
                     continue;
                 }
 
                 //이미 확인한 경우
                 if(visited[next.row][next.col]){
-                    // System.out.println("이미 방문함");
                     continue;
                 }
-                
-                //더이상 확인할 필요가 없으므로 방문 확인
 
                 //색깔이 다른 경우
                 if(map[next.row][next.col] != startPuyo.color){
-                    // System.out.println("색이 다름");
                     continue;
                 }
                 //색이 시작색과 같은 경우만 남는다.
