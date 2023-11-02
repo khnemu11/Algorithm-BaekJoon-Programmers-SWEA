@@ -1,7 +1,9 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-
+/*
+* 	걸린 시간 : 5분
+* */
 public class Main {
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -22,11 +24,12 @@ public class Main {
 
 		while(r < arr.length){
 			long differ = arr[r] - arr[l];
+
 			if(differ >= M && min_differ > differ ){
 				min_differ = differ;
 			}
 
-			if(differ >= M && l < r){
+			if(differ > M){
 				l++;
 			}else {
 				r++;
