@@ -1,4 +1,6 @@
-
+/*
+    걸린시간 : 2시간 8초
+*/
 import java.util.*;
 
 class Solution {
@@ -60,24 +62,15 @@ class Solution {
                     }  
                 }   
             }
-            
-            List<int[][]>boardList = new ArrayList<>();
-            
-            boardList.add(rotate(keyBoard));
-            // boardList.add(moveTop(keyBoard));
-            // boardList.add(moveBottom(keyBoard));
-            // boardList.add(moveLeft(keyBoard));
-            // boardList.add(moveRight(keyBoard));
-            
-            for(int[][] next : boardList){
-                String nextKeyString = ArrToString(next);
+
+            int[][] rotated = rotate(keyBoard);
+            String nextKeyString = ArrToString(rotated);
                 
-                if(visited.contains(nextKeyString)){
-                    continue;
-                }
-                
-                q.add(nextKeyString);
+            if(visited.contains(nextKeyString)){
+                continue;
             }
+                
+            q.add(nextKeyString);
         }
 
         return false;
@@ -101,63 +94,7 @@ class Solution {
         
         return false;
     }
-     public int[][] moveRight(int key[][]){
-        int[][] moved = new int[key.length][key[0].length];
-         
-        for(int i=0;i<key.length;i++){
-            for(int j=key.length-1;j>0;j--){
-                moved[i][j] = key[i][j-1];
-            }   
-            moved[i][0]=EMPTY;
-        }
-         
-        return moved;
-    }
-     public int[][] moveTop(int key[][]){
-        int[][] moved = new int[key.length][key[0].length];
-         
-        for(int j=0;j<key.length;j++){
-            for(int i=0;i<key.length-1;i++){
-                moved[i][j] = key[i+1][j];
-            }   
-            moved[key.length-1][j]=EMPTY;
-        }
-         
-        return moved;
-    }
-    public int[][] moveBottom(int key[][]){
-        int[][] moved = new int[key.length][key[0].length];
-         
-        for(int j=0;j<key.length;j++){
-           for(int i=key.length-1;i>0;i--){
-                moved[i][j] = key[i-1][j];
-            }     
-            moved[0][j]=EMPTY;
-        }
-         
-        return moved;
-    }
-     public int[][] moveLeft(int key[][]){
-        int[][] moved = new int[key.length][key[0].length];
-         
-        for(int i=0;i<key.length;i++){
-            for(int j=0;j<key.length-1;j++){
-                moved[i][j] = key[i][j+1];
-            }   
-            moved[i][key.length-1]=EMPTY;
-        }
-         
-        return moved;
-    }
-    public void printArr(int key[][]){
-        for(int i=0;i<key.length;i++){
-            for(int j=0;j<key[i].length;j++){
-                System.out.print(key[i][j]+" ");
-            }   
-            System.out.println();
-        }
-        System.out.println();
-    }
+
     public int[][] StringToArr(String key){
          int[][] keyBoard = new int[3*N][3*N];
         
