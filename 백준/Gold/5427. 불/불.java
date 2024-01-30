@@ -92,13 +92,7 @@ public class Main {
                         if(outOfArray(nextPeople,buildingMap)){
                             continue;
                         }
-                        if(buildingMap[nextPeople.row][nextPeople.col] == WALL){
-                            continue;
-                        }
-                        if(buildingMap[nextPeople.row][nextPeople.col] == FIRE){
-                            continue;
-                        }
-                        if(buildingMap[nextPeople.row][nextPeople.col] == PEOPLE){
+                        if(buildingMap[nextPeople.row][nextPeople.col] != EMPTY){
                             continue;
                         }
 
@@ -146,5 +140,13 @@ class Coordinate{
     public Coordinate(int row, int col){
         this.row = row;
         this.col = col;
+    }
+
+    @Override
+    public String toString() {
+        return "Coordinate{" +
+                "row=" + row +
+                ", col=" + col +
+                '}';
     }
 }
