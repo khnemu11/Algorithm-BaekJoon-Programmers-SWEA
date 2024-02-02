@@ -32,19 +32,13 @@ public class Main {
         int[] inverseDx = {-1,-1,0,1};
         int[] inverseDy = {0,-1,-1,-1};
 
-        boolean[][]visited = new boolean[SIZE][SIZE];
-
         for(int i=0;i<SIZE;i++){
             for(int j=0;j<SIZE;j++){
-                visited[i][j] = true;
-
-//                System.out.println(i+" , "+j);
                 if(board[i][j] == EMPTY){
                     continue;
                 }
 
                 for(int k=0;k<dx.length;k++){
-//                    System.out.println(i+" , "+j+" "+k);
                     Stone stone = new Stone(board[i][j],i,j);
                     Stone before = new Stone(EMPTY,i+inverseDx[k],j+inverseDy[k]);
                     
@@ -55,7 +49,7 @@ public class Main {
 
                     Stone next = new Stone(EMPTY,i+dx[k],j+dy[k]);
 
-                    boolean victory = isVictory(stone,next,dx[k],dy[k],1,board,visited);
+                    boolean victory = isVictory(stone,next,dx[k],dy[k],1,board);
 
                     if(victory){
                         return stone;
@@ -66,8 +60,7 @@ public class Main {
 
         return new Stone(0,0,0);
     }
-    public static boolean isVictory(Stone start,Stone next, int dx, int dy,int length,int[][]board,boolean[][]visited){
-//        System.out.println(start.row+" , "+start.col+" -> "+next.row+" , "+next.col);
+    public static boolean isVictory(Stone start,Stone next, int dx, int dy,int length,int[][]board){
         if(length == 5){
             if(outOfArray(next,board)){
                 return true;
@@ -80,12 +73,10 @@ public class Main {
             return false;
         }
 
-        visited[next.row][next.col] = true;
-
         next.row+=dx;
         next.col+=dy;
 
-        return isVictory(start,next,dx,dy,length+1,board,visited);
+        return isVictory(start,next,dx,dy,length+1,board);
     }
 
     public static boolean outOfArray(Stone stone, int[][]arr){
