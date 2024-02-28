@@ -34,8 +34,6 @@ public class Main {
 
                     //시계방향 90도를 돌리기 위해 반시계방향 270도 회전
                     rotate(subMap);
-                    rotate(subMap);
-                    rotate(subMap);
 
                     //돌린 값 저장
                     for(int i=0;i<length;i++){
@@ -50,7 +48,7 @@ public class Main {
 
         int sum = getSum(map);
         int largestSize = getLargestSize(map);
-        
+
         System.out.println(sum);
         System.out.println(largestSize);
     }
@@ -159,7 +157,7 @@ public class Main {
 
         for(int i=0;i<arr.length;i++){
             for(int j=0;j<arr[i].length;j++){
-                temp[i][j] = arr[j][arr.length -1 -i];
+                temp[j][i] = arr[arr.length -1 -i][j];
             }
         }
 
