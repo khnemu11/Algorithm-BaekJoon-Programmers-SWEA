@@ -1,56 +1,54 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.StringTokenizer;
 
+/*
+	풀이 알고리즘
+	오름차순 조합을 위해 정렬 후 dfs
+	중복이 되는 수열이 있으면 안되나 순서는 지켜야 하므로 LinkedHashSet을 이용
+*/
+
 public class Main {
-	static ArrayList<Integer> num;
+	static HashSet<String> set = new LinkedHashSet<>();
+	static int N, M;
+	static int nums[];
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		int size = Integer.valueOf(st.nextToken());
-		int length = Integer.valueOf(st.nextToken());
+		N = Integer.valueOf(st.nextToken());
+		M = Integer.valueOf(st.nextToken());
 
-		st = new StringTokenizer(br.readLine());
-		Set<Integer> set = new HashSet<>();
-		for (int i = 0; i < size; i++) {
-			set.add(Integer.valueOf(st.nextToken()));
-		}
-		num = new ArrayList<>();
-		Iterator<Integer> it = set.iterator();
-		while (it.hasNext()) {
-			num.add(it.next());
-		}
-		Collections.sort(num);
-		dfs(0, length, 0, new ArrayList<Integer>());
+		nums = Arrays.stream(br.readLine().split(" ")).mapToInt(x -> Integer.valueOf(x)).toArray();
+		Arrays.sort(nums);
+		combination(0, 0, new int[M]);
 
-		br.close();
+		for (String comb : set) {
+			bw.write(comb + "\n");
+		}
+
+		bw.flush();
 	}
 
-	public static void dfs(int curr, int depth, int start, ArrayList<Integer> list) {
-		if (curr == depth) {
+	public static void combination(int size, int idx, int[] selected) throws IOException {
+		if (size == M) {
 			StringBuilder sb = new StringBuilder();
-
-			for (int candidate : list) {
-				sb.append(candidate).append(" ");
+			for (int num : selected) {
+				sb.append(num + " ");
 			}
-
-			System.out.println(sb.deleteCharAt(sb.length() - 1).toString());
-		}
-
-		else {
-			for (int i = start; i < num.size(); i++) {
-				list.add(num.get(i));
-
-				dfs(curr + 1, depth, i, list);
-
-				list.remove(list.size() - 1);
+			set.add(sb.deleteCharAt(sb.length() - 1).toString());
+		} else {
+			for (int i = idx; i < nums.length; i++) {
+				selected[size] = nums[i];
+				combination(size + 1, i, selected);
 			}
 		}
 	}
