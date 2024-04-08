@@ -17,26 +17,27 @@ public class Main {
             sum[i] = sum[i-1] + num[i];
         }
 
-        long[][] dp = new long[4][N+1];
-        Arrays.fill(dp[0],1);
+        long[][] dp = new long[N+1][5];
+        long count = 0;
 
-        if(sum[N] % 4 == 0){
-            long target = 0;
+       if(sum[N] %4 ==0){
+            long target = sum[N]/4;
 
-            for(int i=1;i<dp.length;i++){
-                target += sum[N]/4;
+            dp[0][0] = 1;
 
-                for(int j=1;j<=N;j++){
-                    dp[i][j] = dp[i][j-1];
+            for(int i=1;i<=N;i++){
+                dp[i][0] = 1;
+                for(int j=1;j<=3;j++){
+                    dp[i][j] = dp[i-1][j];
 
-                    if(sum[j] == target){
+                    if(sum[i] == target*j){
                         dp[i][j] += dp[i-1][j-1];
                     }
                 }
             }
-        }
 
-        long count = dp[3][N];
+            count = dp[N-1][3];
+        }
 
         System.out.println(count);
     }
