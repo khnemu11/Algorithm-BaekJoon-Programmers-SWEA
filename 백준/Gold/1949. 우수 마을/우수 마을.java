@@ -5,7 +5,8 @@ import java.util.*;
 
 /*
 *
-*   21:42
+* 풀이 시간 : 46분
+* 
 * */
 
 public class Main {
@@ -39,10 +40,8 @@ public class Main {
             graph[start].add(end);
             graph[end].add(start);
         }
-
-        getMaxPeople(USED,1);
-
-        System.out.println(Math.max(dp[USED][1],dp[UNUSED][1]));
+        
+        System.out.println(Math.max(getMaxPeople(USED,1), getMaxPeople(UNUSED,1)));
     }
 
     public static int getMaxPeople(int status,int n){
@@ -66,9 +65,4 @@ public class Main {
 
         return dp[status][n];
     }
-}
-class Town{
-    int no;
-    int people;
-    int childMax;
 }
