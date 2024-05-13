@@ -15,7 +15,6 @@ public class Main {
         int M = Integer.parseInt(st.nextToken());
 
         List<Restaurant> restaurantList = new ArrayList<>();
-        PriorityQueue<Restaurant> pq = new PriorityQueue<>();
 
         for(int i=0;i<M;i++){
             st = new StringTokenizer(br.readLine());
@@ -27,8 +26,10 @@ public class Main {
             Restaurant restaurant = new Restaurant(start,end,day);
 
             restaurantList.add(restaurant);
-            pq.add(restaurant);
         }
+        
+        //노점이 빨리 여는 순서부터 정렬
+        Collections.sort(restaurantList);
 
         parent = new int[N+1];
 
@@ -42,28 +43,28 @@ public class Main {
             graph[i] = new HashSet<>();
         }
 
-        while(!pq.isEmpty()){
-            Restaurant curr = pq.poll();
-
-            int pa = getParent(curr.start);
-            int pb = getParent(curr.end);
+        //가능한 한번도 끊기지 않고 연속적으로 노점을 가야하므로 빨리 여는 노점부터 선택
+        for(Restaurant restaurant : restaurantList){
+            int pa = getParent(restaurant.start);
+            int pb = getParent(restaurant.end);
 
             if(pa != pb){
-                graph[curr.start].add(curr.end);
-                graph[curr.end].add(curr.start);
+                graph[restaurant.start].add(restaurant.end);
+                graph[restaurant.end].add(restaurant.start);
 
                 union(pa,pb);
             }
         }
 
         int day = 1;
-
-        Collections.sort(restaurantList);
-
+        
+        //n일차 노점이 있는 경로가 있는지 확인 찾기
         for(Restaurant restaurant : restaurantList){
+            //현재 날짜의 노점이 아니라면 키위는 쓰러진다.
             if(restaurant.day != day){
                 break;
             }
+            //n일차 노점을 갈 수 없으면 키위는 쓰러진다.
             if(!graph[restaurant.start].contains(restaurant.end)){
                break;
             }
