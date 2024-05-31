@@ -1,59 +1,64 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static int N;
-    static long answer = 0L;
-    static int[] data;
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = null;
 
-        N = Integer.parseInt(br.readLine());
-        data = new int[N];
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) {
-            data[i] = Integer.parseInt(st.nextToken());
+        int N = Integer.parseInt(br.readLine());
+        int[] skill = new int[N];
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        for(int i=0;i<N;i++){
+            int val = Integer.parseInt(st.nextToken());
+            skill[i] = val;
         }
-        Arrays.sort(data);
-        for (int i = 0; i < N; i++) {
-            if (data[i] > 0) break;
-            int start = i + 1;
-            int end = N - 1;
 
-            while (start < end) {
-                int s = 1;
-                int e = 1;
-                int current = data[i] + data[start] + data[end];
-                if (current == 0) {
-                    if (data[start] == data[end]) {    // start == end일 경우
-                        answer += comb(end - start + 1);
+        Arrays.sort(skill);
+        long count = 0;
+
+        for(int i=0;i<skill.length;i++){
+            if(skill[i] > 0){
+                break;
+            }
+
+            int left = i+1;
+            int right = N-1;
+
+            while(left < right){
+                int sum = skill[i] + skill[left] + skill[right];
+                long leftSameCount = 1;
+                long rightSameCount = 1;
+
+                if(sum == 0){
+                    if(skill[left] == skill[right]){
+                        long length = right - left + 1;
+
+                        count += length*(length-1)/2;
                         break;
                     }
-                    // start의 다음 값이 같은 경우
-                    while (start + 1 < end && data[start] == data[start + 1]) {
-                        s++;
-                        start++;
+                    while(left + 1 < right && skill[left]  == skill[left+1]){
+                        leftSameCount++;
+                        left++;
                     }
-                    // end의 다음 값이 같은 경우
-                    while (start < end - 1 && data[end] == data[end - 1]) {
-                        e++;
-                        end--;
+                    while(right -1 > left && skill[right]  == skill[right-1] ){
+                        rightSameCount++;
+                        right--;
                     }
 
-                    answer += s * e;
+                    count += leftSameCount*rightSameCount;
                 }
 
-                if (current > 0)
-                    end--;
-                else start++;
+                if(sum > 0){
+                    right--;
+                }else{
+                    left++;
+                }
             }
         }
-        System.out.println(answer);
-    }
 
-    static int comb(int n) {
-        return n * (n - 1) / 2;
+        System.out.println(count);
     }
 }
