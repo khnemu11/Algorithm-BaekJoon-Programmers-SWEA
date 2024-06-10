@@ -12,13 +12,11 @@ public class Main {
         int M = Integer.parseInt(st.nextToken());
 
         int[] teamHI = new int[N];
-        int[] teamHICount = new int[100001];
 
         st = new StringTokenizer(br.readLine());
 
         for(int i=0;i<N;i++){
             teamHI[i] = Integer.parseInt(st.nextToken());
-            teamHICount[teamHI[i]]++;
         }
 
         int[] teamARC = new int[M];
@@ -50,22 +48,7 @@ public class Main {
             draw+=teamARCCount[teamHI[hiIdx]];
         }
 
-
-        long arcWin = 0;
-        long arcWinCount = 0;
-        arcIdx=0;
-        int hiIdx= 0;
-
-        for(; arcIdx < M; arcIdx++){
-            while(hiIdx < N){
-                if(teamHI[hiIdx] >= teamARC[arcIdx]){
-                    break;
-                }
-                hiIdx++;
-                arcWinCount++;
-            }
-            arcWin+=arcWinCount;
-        }
+        long arcWin = (long)N * M - draw - hiwin;
 
         System.out.println(String.format("%d %d %d",hiwin,arcWin,draw));
     }
