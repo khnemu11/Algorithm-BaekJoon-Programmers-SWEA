@@ -6,7 +6,6 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) throws Exception {
         Map<Integer,String> minuteStringMap = new HashMap<>();
-        Map<Integer,String> hourStringMap = new HashMap<>();
 
         minuteStringMap.put(1,"one");
         minuteStringMap.put(2,"two");
@@ -39,44 +38,33 @@ public class Main {
         minuteStringMap.put(29,"twenty nine");
         minuteStringMap.put(30,"half");
 
-        hourStringMap.put(1, "one");
-        hourStringMap.put(2, "two");
-        hourStringMap.put(3, "three");
-        hourStringMap.put(4, "four");
-        hourStringMap.put(5, "five");
-        hourStringMap.put(6, "six");
-        hourStringMap.put(7, "seven");
-        hourStringMap.put(8, "eight");
-        hourStringMap.put(9, "nine");
-        hourStringMap.put(10, "ten");
-        hourStringMap.put(11, "eleven");
-        hourStringMap.put(12, "twelve");
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int hour = Integer.parseInt(br.readLine());
         int minute = Integer.parseInt(br.readLine());
 
         if (minute == 0) {
-            System.out.printf("%s o' clock%n", hourStringMap.get(hour));
+            System.out.printf("%s o' clock%n", minuteStringMap.get(hour));
         } else if (minute <= 30) {
             if (minute == 1) {
-                System.out.printf("one minute past %s%n", hourStringMap.get(hour));
+                System.out.printf("one minute past %s%n", minuteStringMap.get(hour));
             } else if (minute == 15 || minute == 30) {
-                System.out.printf("%s past %s%n", minuteStringMap.get(minute), hourStringMap.get(hour));
+                System.out.printf("%s past %s%n", minuteStringMap.get(minute), minuteStringMap.get(hour));
             } else {
-                System.out.printf("%s minutes past %s%n", minuteStringMap.get(minute), hourStringMap.get(hour));
+                System.out.printf("%s minutes past %s%n", minuteStringMap.get(minute), minuteStringMap.get(hour));
             }
         } else {
-            int toHour = hour == 12 ? 1 : hour + 1;
+            hour = hour == 12 ? 1 : hour + 1;
             minute = 60 - minute;
+
             if (minute == 1) {
-                System.out.printf("one minute to %s%n", hourStringMap.get(toHour));
+                System.out.printf("one minute to %s%n", minuteStringMap.get(hour));
             } else if (minute == 15) {
-                System.out.printf("quarter to %s%n", hourStringMap.get(toHour));
+                System.out.printf("quarter to %s%n", minuteStringMap.get(hour));
             } else {
-                System.out.printf("%s minutes to %s%n", minuteStringMap.get(minute), hourStringMap.get(toHour));
+                System.out.printf("%s minutes to %s%n", minuteStringMap.get(minute), minuteStringMap.get(hour));
             }
         }
     }
 }
+
