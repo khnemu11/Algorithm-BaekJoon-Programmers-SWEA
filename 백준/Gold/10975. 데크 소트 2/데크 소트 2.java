@@ -1,21 +1,13 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
-/*
 
- 1              1
- 1 2 1          4
- 1 2 3 2 1      9
- 1 2 3 4 3 2 1  16
-
-
-*/
 public class Main {
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int N = Integer.parseInt(br.readLine());
-        List<Integer> list = new ArrayList<>();
+        List<Integer> list = new ArrayList<>(); 
         List<Integer> sorted = new ArrayList<>();
 
         for(int i=0;i<N;i++){
@@ -26,13 +18,15 @@ public class Main {
 
         Collections.sort(sorted);
 
-        int offset = 1000;
+        int offset = 1000;  //인덱스로 접근하기 위해 최소값(-1000)을 시작인덱스(0)으로 만들기 위한 오프셋
         int[]next = new int[2001];
         int[]prev = new int[2001];
-
+        
+        //초기화
         Arrays.fill(next,Integer.MAX_VALUE);
         Arrays.fill(prev,Integer.MAX_VALUE);
-
+        
+        //수의 오른쪽값과 왼쪽값을 갱신
         for(int i=0;i<sorted.size();i++){
             if(i+1 < sorted.size()){
                 next[sorted.get(i)+offset] = sorted.get(i+1);
@@ -46,30 +40,32 @@ public class Main {
 
         for(int i=0;i<list.size();i++){
             boolean valid = false;
-
+            
+            //deque를 순회하며 해당 숫자를 바로 옆에 놓을 수 있는지 판다
             for(Deque<Integer> deque : dequeList){
+                //오른쪽에 놓을 수 있는지 판단
                 if(deque.peekFirst() == next[list.get(i)+offset]){
-//                    System.out.println(list.get(i)+" -> "+next[list.get(i)+offset]);
                     deque.addFirst(list.get(i));
                     valid=true;
                     break;
-                }else if(deque.peekLast() == prev[list.get(i)+offset]){
-//                    System.out.println(prev[list.get(i)+offset]+" -> "+list.get(i));
+                }
+                //왼쪽에 놓을 수 있는지 판단
+                else if(deque.peekLast() == prev[list.get(i)+offset]){
                     deque.addLast(list.get(i));
                     valid=true;
                     break;
                 }
             }
-
+                
+            //아무데도 놓지 못했다면 새로운 deque생성
             if(!valid){
                 Deque deque = new ArrayDeque();
                 deque.add(list.get(i));
                 dequeList.add(deque);
             }
-//
-//            System.out.println(dequeList);
         }
-
+        
+        //데큐 개수 출력
         System.out.println(dequeList.size());
     }
 }
