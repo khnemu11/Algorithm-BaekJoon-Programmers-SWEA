@@ -1,15 +1,9 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
-    private static final int MAX_N = 2_000_000;
-
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -24,10 +18,13 @@ public class Main {
 
             int i = Integer.parseInt(st.nextToken())-1;
             int j = Integer.parseInt(st.nextToken())-1;
-
+            
+            //j-1<1 인경우는 0 출력
             if(j-1< i){
                 System.out.println(0);
-            }else{
+            }
+            //아닌경우는 누적합 실행
+            else{
                 int sum = 0;
 
                 for(int r=i+1;r<=j;r++){
