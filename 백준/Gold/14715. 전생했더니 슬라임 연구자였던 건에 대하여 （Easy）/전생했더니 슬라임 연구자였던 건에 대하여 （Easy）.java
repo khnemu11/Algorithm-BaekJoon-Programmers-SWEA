@@ -8,7 +8,8 @@ public class Main {
         int N = Integer.parseInt(br.readLine());
         boolean valid = true;
         int count = 1;
-
+        
+        //소인수 분해 횟수 구하기
         while(valid){
             valid = false;
 
@@ -21,12 +22,10 @@ public class Main {
                 }
             }
         }
-        int digit = 0;
 
-        while(Math.pow(2,digit) < count){
-            digit++;
-        }
+        //완전 이진트리의 높이 구하기
+        int height = (int)Math.ceil(Math.log(count)/Math.log(2));
 
-        System.out.println(digit);
+        System.out.println(height);
     }
 }
