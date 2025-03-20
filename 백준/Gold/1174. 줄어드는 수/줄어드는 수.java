@@ -5,32 +5,30 @@ import java.util.*;
 
 public class Main {
     static ArrayList<Long> list = new ArrayList<>();
-    static int[] arr = {9,8,7,6,5,4,3,2,1,0};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
 
-        setDecreasedNumList(0,0);
-        list.sort(null);
+        setDecreasedNumList(0,9);
+        list.sort(Long::compare);
 
-        try{
-            System.out.println(list.get(N-1));
-        }catch (Exception e){
+        if(list.size() < N){
             System.out.println(-1);
+        }else{
+            System.out.println(list.get(N-1));
         }
     }
 
-    public static void setDecreasedNumList(long num, int idx){
+    public static void setDecreasedNumList(long num, int val){
         if(!list.contains(num)){
             list.add(num);
         }
 
-        if(idx >= arr.length){
+        if(val < 0){
             return;
         }
-
-        setDecreasedNumList(num*10 + arr[idx], idx+1);
-        setDecreasedNumList(num, idx+1);
+        setDecreasedNumList(num*10 + val, val-1);
+        setDecreasedNumList(num, val-1);
     }
 }
